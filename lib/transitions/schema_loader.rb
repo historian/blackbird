@@ -11,7 +11,7 @@ class Transitions::SchemaLoader
       pk_name = connection.primary_key(table)
       has_pk  = !!pk_name
 
-      schema.create_table(table, :id => has_pk, :primary_key => pk_name) do |t|
+      schema.table(table, :id => has_pk, :primary_key => pk_name) do |t|
 
         connection.columns(table).each do |column|
           next if column.name == pk_name

@@ -3,28 +3,22 @@ class Transitions::SchemaDefinition
   attr_reader :tables
 
   def initialize
-    @tables = {}
+    @tables  = {}
+    @patches = ActiveSupport::OrderedHash.new
   end
 
-  def create_table(name, options={})
-    table = Transitions::TableDefinition.new(name, options)
+  def table(name, options={})
+    table = @tables[name.to_s] || begin
+      @tables[name.to_s] = Transitions::TableDefinition.new(name, options)
+    end
     yield(table) if block_given?
-    @tables[table.name] = table
+    self
   end
-
-  def change_table(name)
-    table = @tables[name.to_s]
-    yield(table) if block_given?
-  end
-
-  def rename_table(old_name, new_name)
-    table = @tables.delete(old_name.to_s)
-    table.rename(new_name.to_s)
-    @tables[new_name.to_s] = table
-  end
-
-  def drop_table(name)
-    @tables.delete(name.to_s)
+  
+  def patch(name, options={}, &block)
+    patch = Transitions::Patch.new(name, options, &block)
+    @patches[patch.name] = patch
+    self
   end
 
 end

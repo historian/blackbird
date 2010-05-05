@@ -54,20 +54,8 @@ class Transitions::Transition
 
 private
 
-  def create_table(name, options={}, &block)
-    @schema.create_table(name, options={}, &block)
-  end
-
-  def change_table(name, &block)
-    @schema.change_table(name, &block)
-  end
-
-  def rename_table(old_name, new_name)
-    @schema.rename_table(old_name, new_name)
-  end
-
-  def drop_table(name)
-    @schema.drop_table(name)
+  def table(name, options={}, &block)
+    @schema.table(name, options={}, &block)
   end
 
 end
