@@ -1,61 +1,65 @@
 class Transitions::Transition
 
-  def self.transitions
-    @transitions ||= []
+  def self.build(*search_paths)
+    new(search_paths).build
   end
 
-  def self.inherited(subclass)
-    subclass.version = Thread.current[:transitions_version]
-    Transitions::Transition.transitions.push(subclass)
-    subclass.extend InheritanceBlocker
+  attr_reader :search_paths, :current, :future, :changes, :migration
+
+  def initialize(*search_paths)
+    @search_paths = search_paths.flatten.uniq
   end
 
-  module InheritanceBlocker
-    def inherited(subclass)
-      raise "Cannot inherit form Transitions::Transition subclass."
-    end
+  def build
+    load_schema_definitions
+    load_current
+    build_future
+    analyze_changes
+    build_migration
+
+    self
   end
 
-  def self.load(*search_paths)
-    search_paths = search_paths.flatten.compact
-    search_paths.collect! do |path|
-      File.expand_path(path)
-    end
-    search_paths.uniq!
-    search_paths.each do |path|
-      Dir.entries(path).each do |name|
-        next unless name =~ /^(\d+)_.+\.rb$/
-        Thread.current[:transitions_version] = $1.to_i
-        Kernel.load File.join(path, name)
+  def run!
+    connection = ActiveRecord::Base.connection
+    connection.transaction do
+
+      @migration.instructions.each do |instruction|
+        connection.__send__(*instruction)
       end
+
     end
-    true
-  end
-
-  class << self
-    attr_accessor :version
-  end
-
-  attr_reader :version
-
-  def initialize(version=self.class.version)
-    @version = version
-  end
-
-  def transition
-    # needs to be implemented in subclasses
-  end
-
-  def run(schema)
-    @schema = schema
-    transition
-    @schema
   end
 
 private
 
-  def table(name, options={}, &block)
-    @schema.table(name, options={}, &block)
+  def load_schema_definitions
+    @search_paths.each do |search_path|
+      search_path = File.expand_path(search_path)
+      Dir.glob(File.join(search_path, '**/*_schema.rb')).each do |path|
+        require path
+      end
+    end
+  end
+
+  def load_current
+    @current = Transitions::SchemaLoader.load
+  end
+
+  def build_future
+    @future = Transitions::SchemaDefinition.new
+    builder = Transitions::SchemaBuilder.new(@future)
+    Transitions::Schema.subclasses.each do |schema|
+      schema.new.apply(builder)
+    end
+  end
+
+  def analyze_changes
+    @changes = Transitions::SchemaChanges.analyze!(@current, @future)
+  end
+
+  def build_migration
+    @migration = Transitions::Migration.build(@current, @future, @changes)
   end
 
 end

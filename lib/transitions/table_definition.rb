@@ -29,15 +29,7 @@ class Transitions::TableDefinition
   end
 
   def add_column(name, type, options={})
-    if unique = options.delete(:unique)
-      index_columns = [options.delete(:scope)].flatten.compact
-      index_columns << name
-      add_index(index_columns, :unique => true)
-    end
-
-    if options.delete(:index)
-      add_index(name)
-    end
+    add_indexes_for_options(name, options)
 
     column = Transitions::ColumnDefinition.new(name, type, options)
     @columns[column.name] = column
@@ -58,6 +50,8 @@ class Transitions::TableDefinition
   end
 
   def change_column(name, type, options={})
+    add_indexes_for_options(name, options)
+
     @columns[name.to_s].change(type, options)
   end
 
@@ -71,49 +65,18 @@ class Transitions::TableDefinition
     @indexes.delete(name.to_s)
   end
 
+private
 
-  def integer(name, options={})
-    add_column(name, :integer, options)
-  end
+  def add_indexes_for_options(column, options={})
+    if unique = options.delete(:unique)
+      index_columns = [options.delete(:scope)].flatten.compact
+      index_columns << column
+      add_index(index_columns, :unique => true)
+    end
 
-  def float(name, options={})
-    add_column(name, :float, options)
-  end
-
-  def decimal(name, options={})
-    add_column(name, :decimal, options)
-  end
-
-  def string(name, options={})
-    add_column(name, :string, options)
-  end
-
-  def text(name, options={})
-    add_column(name, :text, options)
-  end
-
-  def boolean(name, options={})
-    add_column(name, :boolean, options)
-  end
-
-  def binary(name, options={})
-    add_column(name, :binary, options)
-  end
-
-  def datetime(name, options={})
-    add_column(name, :datetime, options)
-  end
-
-  def date(name, options={})
-    add_column(name, :date, options)
-  end
-
-  def timestamp(name, options={})
-    add_column(name, :timestamp, options)
-  end
-
-  def remove(name)
-    remove_column name
+    if options.delete(:index)
+      add_index(column)
+    end
   end
 
 end

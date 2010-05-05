@@ -3,6 +3,7 @@ require File.expand_path('../../test_helper', __FILE__)
 class Transitions::SchemaLoaderTest < ActiveSupport::TestCase
 
   setup do
+    reset_connection
     @schema = Transitions::SchemaLoader.load
   end
 

@@ -1,6 +1,6 @@
 class Transitions::IndexDefinition
 
-  attr_reader :name, :columns, :options
+  attr_reader :columns, :options
 
   def initialize(columns, options={})
     @columns, @options = [columns].flatten.compact, options
@@ -11,8 +11,8 @@ class Transitions::IndexDefinition
     @options[:name]
   end
 
-  def hash
-    [@columns, @options].hash
+  def ==(other)
+    self.class === other and @columns == other.columns and @options == other.options
   end
 
 end

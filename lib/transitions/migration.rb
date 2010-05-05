@@ -2,16 +2,12 @@ class Transitions::Migration
 
   attr_reader :instructions
 
-  def self.build(current, future)
-    new(current, future).build
+  def self.build(current, future, changes)
+    new(current, future, changes).build
   end
 
-  def self.run!(current, future)
-    build(current, future).run!
-  end
-
-  def initialize(current, future)
-    @current, @future = current, future
+  def initialize(current, future, changes)
+    @current, @future, @changes = current, future, changes
     @instructions = []
   end
 
@@ -23,27 +19,10 @@ class Transitions::Migration
     self
   end
 
-  def run!
-    connection.transaction do
-      @instructions.each do |instruction|
-        connection.__send__(*instruction)
-      end
-    end
-    true
-  end
-
-private
-
-  def connection
-    ActiveRecord::Base.connection
-  end
-
 private
 
   def create_new_tables
-    new_tables = (@future.tables.keys - @current.tables.keys)
-
-    new_tables.each do |table_name|
+    @changes.new_tables.each do |table_name|
       table = @future.tables[table_name]
 
       pk_name = table.primary_key
@@ -66,124 +45,64 @@ private
   end
 
   def change_existing_tables
-    existing_tables = (@future.tables.keys & @current.tables.keys)
-
-    changed_tables = existing_tables.inject([]) do |memo, table_name|
-      current_table = @current.tables[table_name]
+    # new columns
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
       future_table  = @future.tables[table_name]
 
-      memo << table_name unless current_table.hash == future_table.hash
+      changes.new_columns.each do |name|
+        column = future_table.columns[name]
+        @instructions << [
+          :add_column, table_name, name, column.type, column.options]
+      end
 
-      memo
+      changes.new_indexes.each do |name|
+        index = future_table.indexes[name]
+        @instructions << [
+          :add_index, table_name, index.columns, index.options]
+      end
     end
 
-    changed_tables.each do |table_name|
-      current_table = @current.tables[table_name]
+    # column changes
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
       future_table  = @future.tables[table_name]
 
-      create_new_columns      current_table, future_table
-      create_new_indexes      current_table, future_table
+      changes.changed_columns.each do |name|
+        column = future_table.columns[name]
+        @instructions << [
+          :change_column, table_name, name, column.type, column.options]
+      end
+
+      changes.changed_indexes.each do |name|
+        index = future_table.indexes[name]
+        @instructions << [
+          :remove_index, table_name, name]
+        @instructions << [
+          :add_index, table_name, index.columns, index.options]
+      end
     end
 
-    changed_tables.each do |table_name|
-      current_table = @current.tables[table_name]
-      future_table  = @future.tables[table_name]
+    # old columns
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
 
-      change_existing_columns current_table, future_table
-      change_existing_indexes current_table, future_table
-    end
+      changes.old_columns.each do |name|
+        @instructions << [
+          :remove_column, table_name, name]
+      end
 
-    changed_tables.each do |table_name|
-      current_table = @current.tables[table_name]
-      future_table  = @future.tables[table_name]
-
-      remove_old_indexes      current_table, future_table
-      remove_old_columns      current_table, future_table
+      changes.old_indexes.each do |name|
+        @instructions << [
+          :remove_index, table_name, name]
+      end
     end
   end
 
   def remove_old_tables
-    old_tables = (@current.tables.keys - @future.tables.keys)
-
-    old_tables.each do |table_name|
+    @changes.old_tables.each do |table_name|
       @instructions << [
         :drop_table, table_name]
-    end
-  end
-
-private
-
-  def create_new_columns(current_table, future_table)
-    new_columns = (future_table.columns.keys - current_table.columns.keys)
-
-    new_columns.each do |column_name|
-      column = future_table.columns[column_name]
-
-      @instructions << [
-        :add_column, current_table.name,
-        column_name, column.type, column.options]
-    end
-  end
-
-  def change_existing_columns(current_table, future_table)
-    existing_columns = (future_table.columns.keys & current_table.columns.keys)
-
-    existing_columns.each do |column_name|
-      current_column = current_table.columns[column_name]
-      future_column  = future_table.columns[column_name]
-
-      next if current_column.hash == future_column.hash
-
-      @instructions << [
-        :change_column, current_table.name,
-        column_name, future_column.type, future_column.options]
-    end
-  end
-
-  def remove_old_columns(current_table, future_table)
-    old_columns = (current_table.columns.keys - future_table.columns.keys)
-
-    old_columns.each do |column_name|
-      @instructions << [
-        :remove_column, current_table.name, column_name]
-    end
-  end
-
-private
-
-  def create_new_indexes(current_table, future_table)
-    new_indexes = (future_table.indexes.keys - current_table.indexes.keys)
-
-    new_indexes.each do |index_name|
-      index = future_table.indexes[index_name]
-      @instructions << [
-        :add_index, current_table.name, index.columns, index.options]
-    end
-  end
-
-  def change_existing_indexes(current_table, future_table)
-    existing_indexes = (future_table.indexes.keys & current_table.indexes.keys)
-
-    existing_indexes.each do |index_name|
-      current_index = current_table.indexes[index_name]
-      future_index  = future_table.indexes[index_name]
-
-      next if current_index.hash == future_index.hash
-
-      @instructions << [
-        :remove_index, current_table.name, index_name]
-      @instructions << [
-        :add_index, current_table.name,
-        future_index.columns, future_index.options]
-    end
-  end
-
-  def remove_old_indexes(current_table, future_table)
-    old_indexes = (current_table.indexes.keys - future_table.indexes.keys)
-
-    old_indexes.each do |index_name|
-      @instructions << [
-        :remove_index, current_table.name, index_name]
     end
   end
 

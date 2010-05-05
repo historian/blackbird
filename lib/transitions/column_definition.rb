@@ -14,4 +14,12 @@ class Transitions::ColumnDefinition
     [@name, @type, @options].hash
   end
 
+  def change(type, options={})
+    @type, @options = type, options
+  end
+
+  def ==(other)
+    self.class === other and @name == other.name and @type == other.type and @options == other.options
+  end
+
 end

@@ -6,12 +6,13 @@ class Transitions::SchemaLoader
 
   def load
     schema = Transitions::SchemaDefinition.new
+    builder = Transitions::SchemaBuilder.new(schema)
 
     connection.tables.each do |table|
       pk_name = connection.primary_key(table)
       has_pk  = !!pk_name
 
-      schema.table(table, :id => has_pk, :primary_key => pk_name) do |t|
+      builder.table(table, :id => has_pk, :primary_key => pk_name) do |t|
 
         connection.columns(table).each do |column|
           next if column.name == pk_name
@@ -35,15 +36,21 @@ class Transitions::SchemaLoader
             options[:precision] = column.precision
           end
 
-          t.add_column(column.name, column.type, options)
+          t.column(column.name, column.type, options)
 
         end
 
         connection.indexes(table).each do |index|
 
-          t.add_index(index.columns,
-            :name   => index.name,
-            :unique => index.unique)
+          options = {
+            :name => index.name
+          }
+
+          if index.unique
+            options[:unique] = index.unique
+          end
+
+          t.index(index.columns, options)
 
         end
 
