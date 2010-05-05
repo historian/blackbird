@@ -1,5 +1,9 @@
 class Transitions::Transition
 
+  def run!(*search_paths)
+    build(search_paths).run!
+  end
+
   def self.build(*search_paths)
     new(search_paths).build
   end
@@ -29,6 +33,8 @@ class Transitions::Transition
       end
 
     end
+
+    self
   end
 
 private
