@@ -1,5 +1,5 @@
 *.gem
 doc/
+tmp/
 coverage
 .yardoc
-tmp/test.db
