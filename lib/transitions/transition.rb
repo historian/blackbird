@@ -29,7 +29,11 @@ class Transitions::Transition
     connection.transaction do
 
       @migration.instructions.each do |instruction|
-        connection.__send__(*instruction)
+        if instruction.first == :log
+          puts instruction.last if Transitions.options[:verbose]
+        else
+          connection.__send__(*instruction)
+        end
       end
 
     end

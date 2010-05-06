@@ -18,8 +18,8 @@ class Transitions::SchemaChanges
       memo
     end
 
-    @new_tables      = (@future.tables.keys - @current.tables.keys)
-    @old_tables      = (@current.tables.keys - @future.tables.keys)
+    @new_tables      = (@future.tables.keys - @current.tables.keys).sort
+    @old_tables      = (@current.tables.keys - @future.tables.keys).sort
     @changed_tables  = @table_changes.inject([]) do |memo, (table_name, table)|
       if @new_tables.include?(table_name)
         memo
@@ -31,9 +31,9 @@ class Transitions::SchemaChanges
       else
         memo
       end
-    end
+    end.sort
     @unchanged_tables = (@table_changes.keys -
-      (@changed_tables + @new_tables + @old_tables))
+      (@changed_tables + @new_tables + @old_tables)).sort
 
     self
   end

@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'shoulda'
 require 'transitions'
-
+require 'fileutils'
 
 tmp = File.expand_path('../../tmp', __FILE__)
 FileUtils.mkdir_p(tmp)
@@ -35,7 +35,7 @@ class ActiveSupport::TestCase
     tmp = File.expand_path('../../tmp', __FILE__)
     FileUtils.rm_f(tmp+'/test_real.db')
     FileUtils.cp(tmp+'/test.db', tmp+'/test_real.db')
-    
+
     ActiveRecord::Base.establish_connection({
       :adapter => 'sqlite3',
       :database => tmp+'/test_real.db'
@@ -43,7 +43,8 @@ class ActiveSupport::TestCase
   end
 end
 
-SEARCH_PATHS = [
-  File.expand_path('../fixtures/a', __FILE__),
-  File.expand_path('../fixtures/b', __FILE__)
-]
+Transitions.options[:verbose] = false
+
+SCHEMA_PATHS = (
+  Dir.glob(File.expand_path('../fixtures/a/**/*_schema.rb', __FILE__)) +
+  Dir.glob(File.expand_path('../fixtures/b/**/*_schema.rb', __FILE__)) )

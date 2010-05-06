@@ -4,7 +4,7 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
 
   setup do
     reset_connection
-    @transition = Transitions::Transition.build(SEARCH_PATHS)
+    @transition = Transitions::Transition.build(SCHEMA_PATHS)
   end
 
   context "changes" do

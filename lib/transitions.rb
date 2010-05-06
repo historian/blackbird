@@ -25,4 +25,8 @@ module Transitions
     require 'transitions/railtie'
   end
 
+  def self.options
+    @options ||= { :verbose => true }
+  end
+
 end

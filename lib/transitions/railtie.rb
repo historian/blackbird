@@ -1,8 +1,13 @@
 class Transitions::Railtie < Rails::Railtie
 
   config.transitions = ActiveSupport::OrderedOptions.new
+  config.transitions.verbose  = true
   config.transitions.auto_run = false
-  config.transitions.schemas = nil
+  config.transitions.schemas  = nil
+
+  initializer "transitions.setup_configuration" do |app|
+    Transitions.options[:verbose] = app.config.transitions.verbose
+  end
 
   initializer "transitions.find_schemas" do |app|
     unless config.transitions.schemas
