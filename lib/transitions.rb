@@ -21,10 +21,8 @@ module Transitions
   require 'transitions/column_definition'
   require 'transitions/index_definition'
 
-  def self.run!
-    current_schema = SchemaLoader.load
-    new_schema     = TransitionRunner.run
-    Migration.run!(current_schema, new_schema)
+  if defined?(Rails::Railtie)
+    require 'transitions/railtie'
   end
 
 end

@@ -1,17 +1,17 @@
 class Transitions::Transition
 
-  def run!(*search_paths)
-    build(search_paths).run!
+  def self.run!(*schema_files)
+    build(schema_files).run!
   end
 
-  def self.build(*search_paths)
-    new(search_paths).build
+  def self.build(*schema_files)
+    new(schema_files).build
   end
 
-  attr_reader :search_paths, :current, :future, :changes, :migration
+  attr_reader :schema_files, :current, :future, :changes, :migration
 
-  def initialize(*search_paths)
-    @search_paths = search_paths.flatten.uniq
+  def initialize(*schema_files)
+    @schema_files = schema_files.flatten.uniq.compact
   end
 
   def build
@@ -40,11 +40,8 @@ class Transitions::Transition
 private
 
   def load_schema_definitions
-    @search_paths.each do |search_path|
-      search_path = File.expand_path(search_path)
-      Dir.glob(File.join(search_path, '**/*_schema.rb')).each do |path|
-        require path
-      end
+    @schema_files.each do |path|
+      require path
     end
   end
 

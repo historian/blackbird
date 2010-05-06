@@ -21,6 +21,6 @@ Gem::Specification.new do |s|
   s.files        = Dir.glob("{lib}/**/*") +
                    %w(LICENSE README.md ROADMAP.md CHANGELOG.md)
   
-  s.add_runtime_dependency     'active_record', '>= 2.3.4'
-  s.add_development_dependency 'shoulda',       '>= 2.10.3'
+  s.add_runtime_dependency     'activerecord', '>= 2.3.4'
+  s.add_development_dependency 'shoulda',      '>= 2.10.3'
 end

@@ -77,7 +77,7 @@ private
       changes.changed_indexes.each do |name|
         index = future_table.indexes[name]
         @instructions << [
-          :remove_index, table_name, name]
+          :remove_index, table_name, {:name => name}]
         @instructions << [
           :add_index, table_name, index.columns, index.options]
       end
@@ -87,14 +87,14 @@ private
     @changes.changed_tables.each do |table_name|
       changes       = @changes.table(table_name)
 
+      changes.old_indexes.each do |name|
+        @instructions << [
+          :remove_index, table_name, {:name => name}]
+      end
+
       changes.old_columns.each do |name|
         @instructions << [
           :remove_column, table_name, name]
-      end
-
-      changes.old_indexes.each do |name|
-        @instructions << [
-          :remove_index, table_name, name]
       end
     end
   end

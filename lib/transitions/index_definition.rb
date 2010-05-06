@@ -1,6 +1,6 @@
 class Transitions::IndexDefinition
 
-  attr_reader :columns, :options
+  attr_reader :name, :columns, :options
 
   def initialize(columns, options={})
     @columns, @options = [columns].flatten.compact, options
