@@ -76,7 +76,7 @@ class Transitions::TableChanges
     @all_columns.include?(name.to_s)
   end
 
-  def exists?(name)
+  def index_exists?(name)
     @all_indexes.include?(name.to_s)
   end
 

@@ -62,6 +62,22 @@ private
     end
   end
 
+  def apply_patches
+    @changes.new_patches.each do |patch_name|
+
+      if Transitions.options[:verbose]
+        @instructions << [
+          :log, "--- Applying patch #{patch.name}"]
+      end
+
+      patch = @future.patches[patch_name]
+      patch.call(@changes)
+
+      @instructions.concat(patch.instructions)
+
+    end
+  end
+
   def change_existing_tables
     # new columns
     @changes.changed_tables.each do |table_name|
@@ -101,6 +117,8 @@ private
           :add_index, table_name, index.columns, index.options]
       end
     end
+
+    apply_patches
 
     # column changes
     @changes.changed_tables.each do |table_name|

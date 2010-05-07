@@ -4,9 +4,7 @@ class Transitions::SchemaBuilder
     @schema = schema
   end
 
-  def table(name, options={}, &block)
-    block, options = options, {} if Proc === options and block.nil?
-
+  def table(schema, name, options={}, &block)
     name  = name.to_s
     table = @schema.tables[name] || begin
       @schema.tables[name] = Transitions::TableDefinition.new(name, options)
@@ -15,10 +13,8 @@ class Transitions::SchemaBuilder
     self
   end
 
-  def patch(name, options={}, &block)
-    block, options = options, {} if Proc === options and block.nil?
-
-    patch = Transitions::Patch.new(name, options, &block)
+  def patch(schema, name, options={}, &block)
+    patch = Transitions::Patch.new(schema, name, options, &block)
     @schema.patches[patch.name] = patch
     self
   end

@@ -21,8 +21,8 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
       assert_equal %w( pages posts ), @transition.changes.changed_tables
     end
 
-    should "not have unchanged tables" do
-      assert_equal %w( ), @transition.changes.unchanged_tables
+    should "not want to changed :users" do
+      assert_equal %w( users ), @transition.changes.unchanged_tables
     end
 
     context ":posts" do
@@ -74,13 +74,19 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
   should "build instructions" do
 
     migration = @transition.migration
+    method = @transition.schemas[CommentsSchema].method(:set_user_names)
+
     assert_equal [
       [:create_table, "comments", {:id=>true, :primary_key=>"id"}],
       [:add_column, "comments", "post_id", :integer, {}],
+      [:add_column, "comments", "user_id", :integer, {}],
       [:add_column, "comments", "body", :text, {}],
       [:add_column, "comments", "posted_at", :datetime, {}],
+      [:add_column, "comments", "username", :string, {}],
       [:add_index, "comments", ["post_id"], {
         :name=>"index_comments_on_post_id"}],
+      [:add_index, "comments", ["user_id"], {
+        :name=>"index_comments_on_user_id"}],
       [:add_index, "comments", ["posted_at"], {
         :name=>"index_comments_on_posted_at"}],
       [:add_column, "pages", "published_at", :datetime, {}],
@@ -90,6 +96,7 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
         :name=>"index_pages_on_published_at"}],
       [:add_index, "posts", ["title"], {:unique=>true,
         :name=>"index_posts_on_title"}],
+      [:apply, method],
       [:change_column, "pages", "body", :text, {}],
       [:remove_column, "pages", "image_id"],
       [:drop_table, "images"]

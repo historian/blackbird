@@ -8,11 +8,19 @@ class Transitions::SchemaLoader
     schema = Transitions::SchemaDefinition.new
     builder = Transitions::SchemaBuilder.new(schema)
 
+    schema.patches = []
+
     connection.tables.each do |table|
+
+      if table == 'transitions_patches'
+        schema.patches = connection.select_values(
+          %{ SELECT name FROM transitions_patches })
+      end
+
       pk_name = connection.primary_key(table)
       has_pk  = !!pk_name
 
-      builder.table(table, :id => has_pk, :primary_key => pk_name) do |t|
+      builder.table(nil, table, :id => has_pk, :primary_key => pk_name) do |t|
 
         connection.columns(table).each do |column|
           next if column.name == pk_name

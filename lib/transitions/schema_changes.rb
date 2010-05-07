@@ -5,6 +5,7 @@ class Transitions::SchemaChanges
   end
 
   attr_reader :new_tables, :old_tables, :changed_tables, :unchanged_tables
+  attr_reader :new_patches, :old_patches
 
   def initialize(current, future)
     @current, @future = current, future
@@ -35,6 +36,9 @@ class Transitions::SchemaChanges
     @unchanged_tables = (@table_changes.keys -
       (@changed_tables + @new_tables + @old_tables)).sort
 
+    @new_patches = @future.patches.keys - @current.patches
+    @old_patches = @current.patches - @future.patches.keys
+
     self
   end
 
@@ -60,6 +64,14 @@ class Transitions::SchemaChanges
 
   def exists?(name)
     @table_changes.key?(name.to_s)
+  end
+
+  def should_apply?(patch)
+    @new_patches.include?(patch)
+  end
+
+  def should_forget?(patch)
+    @old_patches.include?(patch)
   end
 
 end

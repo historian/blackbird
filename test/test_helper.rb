@@ -28,6 +28,13 @@ ActiveRecord::Schema.define do
     t.column "caption", :text
     t.column "filename", :string
   end
+
+  create_table "users", :force => true do |t|
+    t.column "full_name", :string
+  end
+
+  ActiveRecord::Base.connection.execute('INSERT INTO users (id, full_name) VALUES (1, "Simon Menke")')
+  ActiveRecord::Base.connection.execute('INSERT INTO users (id, full_name) VALUES (2, "Yves")')
 end
 
 class ActiveSupport::TestCase

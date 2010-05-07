@@ -8,7 +8,7 @@ class Transitions::Transition
     new(schema_files).build
   end
 
-  attr_reader :schema_files, :current, :future, :changes, :migration
+  attr_reader :schema_files, :current, :future, :changes, :migration, :schemas
 
   def initialize(*schema_files)
     @schema_files = schema_files.flatten.uniq.compact
@@ -29,7 +29,10 @@ class Transitions::Transition
     connection.transaction do
 
       @migration.instructions.each do |instruction|
-        if instruction.first == :log
+        case instruction.first
+        when :apply
+          instruction.last.call
+        when :log
           puts instruction.last if Transitions.options[:verbose]
         else
           connection.__send__(*instruction)
@@ -55,9 +58,12 @@ private
 
   def build_future
     @future = Transitions::SchemaDefinition.new
+    @schemas = ActiveSupport::OrderedHash.new
     builder = Transitions::SchemaBuilder.new(@future)
     Transitions::Schema.subclasses.each do |schema|
-      schema.new.apply(builder)
+      schema = schema.new
+      @schemas[schema.class] = schema
+      schema.apply(builder)
     end
   end
 
