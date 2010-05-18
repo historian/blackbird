@@ -5,6 +5,10 @@ class Transitions::Railtie < Rails::Railtie
   config.transitions.auto_run = false
   config.transitions.schemas  = nil
 
+  rake_tasks do
+    load "transitions/railtie/tasks.rake"
+  end
+
   initializer "transitions.setup_configuration" do |app|
     Transitions.options[:verbose] = app.config.transitions.verbose
   end
