@@ -4,11 +4,13 @@ class Transitions::Table::Changes
     new(current, future).analyze!
   end
 
-  attr_reader :new_columns, :old_columns, :all_columns, :changed_columns, :unchanged_columns
+  attr_reader :current, :future
+  attr_reader :new_columns, :old_columns, :all_columns, :changed_columns, :unchanged_columns, :renamed_columns
   attr_reader :new_indexes, :old_indexes, :all_indexes, :changed_indexes, :unchanged_indexes
 
   def initialize(current, future)
     @current, @future = current, future
+    @renamed_columns = []
   end
 
   def analyze!

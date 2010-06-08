@@ -13,6 +13,8 @@ class Transitions::Migration
   end
 
   def build
+    evaluate_patches
+
     create_new_tables
     change_existing_tables
     remove_old_tables
@@ -49,14 +51,21 @@ private
     end
   end
 
-  def apply_patches
+  def evaluate_patches
+    @evaluated_patches = []
     @changes.new_patches.each do |patch_name|
-
-      log "--- Applying patch #{patch_name}"
 
       patch = @future.patches[patch_name]
       patch.call(@changes)
+      @evaluated_patches << patch
 
+    end
+  end
+
+  def apply_patches
+    @evaluated_patches.each do |patch|
+
+      log "--- Applying patch #{patch.name}"
       @instructions.concat(patch.instructions)
 
     end

@@ -54,7 +54,17 @@ class Transitions::Patch
     end
 
     def rename(old_name, new_name)
-      @patch << [:rename_column, @changes.current.name, old_name, new_name]
+      @changes.old_columns.delete(old_name.to_s)
+      @changes.new_columns.delete(new_name.to_s)
+      # @changes.future.indexes.each do |(k, index)|
+      #   if idx = index.columns.index(old_name.to_s)
+      #     @changes.future.indexes.delete(index.name)
+      #     index.columns[idx] = new_name.to_s
+      #     index.options[:name] = nil
+      #     @changes.future.indexes[index.name] = index
+      #   end
+      # end
+      @patch << [:rename_column, @changes.current.name, old_name.to_sym, new_name.to_sym]
     end
 
   end

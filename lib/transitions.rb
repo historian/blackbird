@@ -6,15 +6,15 @@ module Transitions
 
   require 'transitions/transition'
   require 'transitions/migration'
-  require 'transitions/patch'
-  require 'transitions/fragment'
 
+  require 'transitions/fragment'
   require 'transitions/schema'
   require 'transitions/table'
   require 'transitions/column'
   require 'transitions/index'
+  require 'transitions/patch'
 
-  if defined?(Rails::Railtie)
+  if defined?(::Rails::Railtie)
     require 'transitions/railtie'
   end
 

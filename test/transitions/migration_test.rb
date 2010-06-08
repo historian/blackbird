@@ -97,6 +97,7 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
       [:add_index, "posts", ["title"], {:unique=>true,
         :name=>"index_posts_on_title"}],
       [:apply, method],
+      [:rename_column, "posts", :published_at, :posted_at],
       [:change_column, "pages", "body", :text, {}],
       [:remove_column, "pages", "image_id"],
       [:drop_table, "images"]

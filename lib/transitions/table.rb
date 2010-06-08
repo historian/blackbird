@@ -49,8 +49,7 @@ class Transitions::Table
   end
 
   def add_index(columns, options={})
-    options[:name] ||= "index_#{@name}_on_#{Array(columns) * '_and_'}"
-    index = Transitions::Index.new(columns, options)
+    index = Transitions::Index.new(@name, columns, options)
     @indexes[index.name] = index
   end
 

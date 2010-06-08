@@ -2,13 +2,14 @@ class Transitions::Index
 
   attr_reader :name, :columns, :options
 
-  def initialize(columns, options={})
+  def initialize(table_name, columns, options={})
+    @table_name = table_name
     @columns, @options = [columns].flatten.compact, options
     @columns.collect! { |n| n.to_s }
   end
 
   def name
-    @options[:name]
+    @options[:name] ||= "index_#{@table_name}_on_#{Array(@columns) * '_and_'}"
   end
 
   def hash

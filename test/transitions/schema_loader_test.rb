@@ -35,10 +35,6 @@ class Transitions::SchemaLoaderTest < ActiveSupport::TestCase
       assert @table.columns.key?('title')
       assert_equal @table.columns['title'].type, :string
     end
-
-    should "not have column called 'published_at'" do
-      assert !@table.columns.key?('published_at')
-    end
   end
 
 end

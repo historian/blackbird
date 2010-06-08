@@ -16,6 +16,7 @@ ActiveRecord::Schema.define do
   create_table "posts", :force => true do |t|
     t.column "title", :string
     t.column "body",  :text
+    t.column "published_at", :datetime
   end
 
   create_table "pages", :force => true do |t|

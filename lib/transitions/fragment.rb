@@ -6,6 +6,7 @@ class Transitions::Fragment
 
   def self.inherited(subclass)
     Transitions::Fragment.subclasses.push(subclass)
+    subclass.extend InheritanceBlocker
   end
 
   def self.instructions
@@ -26,12 +27,9 @@ class Transitions::Fragment
 
   def apply(builder)
     @instructions.each do |instruction|
-      block = nil
       instruction = instruction.dup
-      if Proc === instruction.last
-        block = instruction.pop
-      end
       instruction[1,0] = self
+      block = (Proc === instruction.last ? instruction.pop : nil)
       builder.__send__(*instruction, &block)
     end
   end
@@ -48,6 +46,12 @@ private
         connection.quote(arguments.shift)
       end
       connection.__send__(m, sql)
+    end
+  end
+
+  module InheritanceBlocker
+    def inherited(base)
+      raise "#{base} cannot inherit from non abstract fragment #{self}"
     end
   end
 
