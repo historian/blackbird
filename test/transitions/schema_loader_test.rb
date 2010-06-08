@@ -4,7 +4,7 @@ class Transitions::SchemaLoaderTest < ActiveSupport::TestCase
 
   setup do
     reset_connection
-    @schema = Transitions::SchemaLoader.load
+    @schema = Transitions::Schema::Loader.load
   end
 
   context "table called 'posts'" do

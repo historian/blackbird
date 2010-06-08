@@ -52,6 +52,6 @@ end
 
 Transitions.options[:verbose] = false
 
-SCHEMA_PATHS = (
-  Dir.glob(File.expand_path('../fixtures/a/**/*_schema.rb', __FILE__)) +
-  Dir.glob(File.expand_path('../fixtures/b/**/*_schema.rb', __FILE__)) )
+FRAGMENT_PATHS = (
+  Dir.glob(File.expand_path('../fixtures/a/**/*_fragment.rb', __FILE__)) +
+  Dir.glob(File.expand_path('../fixtures/b/**/*_fragment.rb', __FILE__)) )

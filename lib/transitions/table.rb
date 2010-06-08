@@ -1,4 +1,7 @@
-class Transitions::TableDefinition
+class Transitions::Table
+
+  require 'transitions/table/builder'
+  require 'transitions/table/changes'
 
   attr_reader :name, :options, :columns, :indexes
 
@@ -31,7 +34,7 @@ class Transitions::TableDefinition
   def add_column(name, type, options={})
     add_indexes_for_options(name, options)
 
-    column = Transitions::ColumnDefinition.new(name, type, options)
+    column = Transitions::Column.new(name, type, options)
     @columns[column.name] = column
   end
 
@@ -57,7 +60,7 @@ class Transitions::TableDefinition
 
   def add_index(columns, options={})
     options[:name] ||= "index_#{@name}_on_#{Array(columns) * '_and_'}"
-    index = Transitions::IndexDefinition.new(columns, options)
+    index = Transitions::Index.new(columns, options)
     @indexes[index.name] = index
   end
 

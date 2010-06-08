@@ -1,4 +1,4 @@
-class CommentsSchema < Transitions::Schema
+class CommentsFragment < Transitions::Fragment
 
   table :comments do |t|
     t.remove   :published_at

@@ -1,4 +1,4 @@
-class Transitions::ColumnDefinition
+class Transitions::Column
 
   attr_reader :name, :type, :options
 

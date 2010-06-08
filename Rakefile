@@ -2,11 +2,12 @@
 desc "build the transitions"
 task :build do
   sh "gem build transitions.gemspec"
+  system('mkdir -p ./pkg ; mv *.gem ./pkg/')
 end
 
 desc "install the transitions"
 task :install => [:load_version, :build] do
-  sh "gem install transitions-#{Transitions::VERSION}.gem"
+  sh "gem install pkg/transitions-#{Transitions::VERSION}.gem"
 end
 
 desc "release the transitions"
@@ -22,7 +23,7 @@ task :release => [:load_version, :build] do
   end
 
   require File.expand_path('../lib/transitions/version', __FILE__)
-  sh "gem push transitions-#{Transitions::VERSION}.gem"
+  sh "gem push pkg/transitions-#{Transitions::VERSION}.gem"
   sh "git tag -a -m \"#{Transitions::VERSION}\" #{Transitions::VERSION}"
   sh "git push origin master"
   sh "git push origin master --tags"

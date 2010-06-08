@@ -1,4 +1,4 @@
-class Transitions::TableBuilder
+class Transitions::Table::Builder
 
   def initialize(schema, table)
     @schema, @table = schema, table

@@ -1,4 +1,4 @@
-class PostsSchema < Transitions::Schema
+class PostsFragment < Transitions::Fragment
 
   table :posts do |t|
     t.string :title, :unique => true

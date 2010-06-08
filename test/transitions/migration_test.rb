@@ -4,7 +4,7 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
 
   setup do
     reset_connection
-    @transition = Transitions::Transition.build(SCHEMA_PATHS)
+    @transition = Transitions::Transition.build(FRAGMENT_PATHS)
   end
 
   context "changes" do
@@ -74,7 +74,7 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
   should "build instructions" do
 
     migration = @transition.migration
-    method = @transition.schemas[CommentsSchema].method(:set_user_names)
+    method = @transition.fragments[CommentsFragment].method(:set_user_names)
 
     assert_equal [
       [:create_table, "comments", {:id=>true, :primary_key=>"id"}],

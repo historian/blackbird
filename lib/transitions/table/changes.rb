@@ -1,4 +1,4 @@
-class Transitions::TableChanges
+class Transitions::Table::Changes
 
   def self.analyze!(current, future)
     new(current, future).analyze!

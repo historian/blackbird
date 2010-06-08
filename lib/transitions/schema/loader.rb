@@ -1,12 +1,12 @@
-class Transitions::SchemaLoader
+class Transitions::Schema::Loader
 
   def self.load
     new.load
   end
 
   def load
-    schema = Transitions::SchemaDefinition.new
-    builder = Transitions::SchemaBuilder.new(schema)
+    schema = Transitions::Schema.new
+    builder = Transitions::Schema::Builder.new(schema)
 
     schema.patches = []
 

@@ -1,3 +1,4 @@
+# Transitions::Migration is responsible for creating database instructions
 class Transitions::Migration
 
   attr_reader :instructions

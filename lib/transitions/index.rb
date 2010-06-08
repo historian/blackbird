@@ -1,4 +1,4 @@
-class Transitions::IndexDefinition
+class Transitions::Index
 
   attr_reader :name, :columns, :options
 
