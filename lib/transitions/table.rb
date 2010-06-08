@@ -27,10 +27,6 @@ class Transitions::Table
     nil
   end
 
-  def rename(name)
-    @name = name.to_s
-  end
-
   def add_column(name, type, options={})
     add_indexes_for_options(name, options)
 
@@ -44,12 +40,6 @@ class Transitions::Table
       index.columns.delete(name.to_s)
       remove_index(index.options[:name]) if index.columns.empty?
     end
-  end
-
-  def rename_column(old_name, new_name)
-    column = @columns.delete(old_name.to_s)
-    column.rename(new_name.to_s)
-    @columns[new_name.to_s] = columns
   end
 
   def change_column(name, type, options={})
