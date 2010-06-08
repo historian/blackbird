@@ -1,13 +1,13 @@
 class Transitions::Patch
 
-  def initialize(schema, name, options={}, &block)
-    @schema       = schema
+  def initialize(fragment, name, options={}, &block)
+    @fragment     = fragment
     @name         = name.to_s
     @options      = options.dup
     @block        = block
   end
 
-  attr_reader :schema, :name, :options, :block, :instructions
+  attr_reader :fragment, :name, :options, :block, :instructions
 
   def call(changes)
     @instructions = []
@@ -34,7 +34,7 @@ class Transitions::Patch
     end
 
     def apply(name)
-      @patch << [:apply, @patch.schema.method(name)]
+      @patch << [:apply, @patch.fragment.method(name)]
     end
 
   end
@@ -50,7 +50,7 @@ class Transitions::Patch
     end
 
     def apply(name)
-      @patch << [:apply, @patch.schema.method(name)]
+      @patch << [:apply, @patch.fragment.method(name)]
     end
 
     def rename(old_name, new_name)
