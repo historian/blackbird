@@ -71,4 +71,9 @@ class Transitions::Table::Builder
     remove_column name
   end
 
+  def timestamps
+    datetime :created_at
+    datetime :updated_at
+  end
+
 end

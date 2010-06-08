@@ -7,6 +7,10 @@ class Transitions::Railtie < Rails::Railtie
 
   config.generators.orm :active_record, :migration => false, :timestamps => true
 
+  rake_tasks do
+    load "transitions/railtie/tasks.rake"
+  end
+
   initializer "transitions.setup_configuration" do |app|
     Transitions.options[:verbose] = app.config.transitions.verbose
   end
