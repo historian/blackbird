@@ -11,8 +11,12 @@ class Transitions::Index
     @options[:name]
   end
 
+  def hash
+    [@columns, @options].hash
+  end
+
   def ==(other)
-    self.class === other and @columns == other.columns and @options == other.options
+    self.hash == other.hash
   end
 
 end
