@@ -18,7 +18,7 @@ module ActiveRecord
       end
 
       def create_schema_file
-        template 'fragment.rb', File.join('app/schemas', class_path, "#{file_name.pluralize}_fragment.rb")
+        template 'fragment.rb', File.join('app/schema', class_path, "#{file_name.pluralize}_fragment.rb")
       end
     end
   end

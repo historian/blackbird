@@ -47,7 +47,7 @@ class Rails::Engine::Configuration
   def paths
     @paths ||= begin
       paths_without_transitions
-      @paths.app.fragments "app/schemas", :glob => "**/*_fragment.rb"
+      @paths.app.fragments "app/schema", :glob => "**/*_fragment.rb"
       @paths
     end
   end
