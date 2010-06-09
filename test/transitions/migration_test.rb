@@ -83,24 +83,26 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
       [:add_column, "comments", "body", :text, {}],
       [:add_column, "comments", "posted_at", :datetime, {}],
       [:add_column, "comments", "username", :string, {}],
-      [:add_index, "comments", ["post_id"], {
-        :name=>"index_comments_on_post_id"}],
-      [:add_index, "comments", ["user_id"], {
-        :name=>"index_comments_on_user_id"}],
-      [:add_index, "comments", ["posted_at"], {
-        :name=>"index_comments_on_posted_at"}],
       [:add_column, "pages", "published_at", :datetime, {}],
+      [:apply, method],
+      [:rename_column, "posts", :published_at, :posted_at],
+      [:change_column, "pages", "body", :text, {}],
+      [:remove_column, "pages", "image_id"],
+      [:drop_table, "images"],
       [:add_index, "pages", ["title"], {
         :name=>"index_pages_on_title"}],
       [:add_index, "pages", ["published_at"], {
         :name=>"index_pages_on_published_at"}],
       [:add_index, "posts", ["title"], {:unique=>true,
         :name=>"index_posts_on_title"}],
-      [:apply, method],
-      [:rename_column, "posts", :published_at, :posted_at],
-      [:change_column, "pages", "body", :text, {}],
-      [:remove_column, "pages", "image_id"],
-      [:drop_table, "images"]
+      [:add_index, "posts", ["posted_at"], {
+        :name=>"index_posts_on_posted_at"}],
+      [:add_index, "comments", ["post_id"], {
+        :name=>"index_comments_on_post_id"}],
+      [:add_index, "comments", ["user_id"], {
+        :name=>"index_comments_on_user_id"}],
+      [:add_index, "comments", ["posted_at"], {
+        :name=>"index_comments_on_posted_at"}]
     ],  migration.instructions
 
   end

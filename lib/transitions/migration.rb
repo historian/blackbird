@@ -15,9 +15,13 @@ class Transitions::Migration
   def build
     evaluate_patches
 
+    remove_old_indexes
+
     create_new_tables
     change_existing_tables
     remove_old_tables
+
+    create_new_indexes
 
     self
   end
@@ -39,14 +43,6 @@ private
 
         log " +c #{name}:#{column.type}"
         run :add_column, table_name, name, column.type, column.options
-      end
-
-      table.indexes.each do |name, index|
-        log(index.options[:unique]       ?
-            " +u #{index.columns * ' '}" :
-            " +i #{index.columns * ' '}" )
-
-        run :add_index, table_name, index.columns, index.options
       end
     end
   end
@@ -77,7 +73,7 @@ private
       changes       = @changes.table(table_name)
       future_table  = @future.tables[table_name]
 
-      unless changes.new_columns.empty? and changes.new_indexes.empty?
+      unless changes.new_columns.empty?
         log "--- Constructive changes for #{table_name}"
       end
 
@@ -86,16 +82,6 @@ private
 
         log " +c #{name}:#{column.type}"
         run :add_column, table_name, name, column.type, column.options
-      end
-
-      changes.new_indexes.each do |name|
-        index = future_table.indexes[name]
-
-        log(index.options[:unique]       ?
-            " +u #{index.columns * ' '}" :
-            " +i #{index.columns * ' '}" )
-
-        run :add_index, table_name, index.columns, index.options
       end
     end
 
@@ -106,7 +92,7 @@ private
       changes       = @changes.table(table_name)
       future_table  = @future.tables[table_name]
 
-      unless changes.changed_columns.empty? and changes.changed_indexes.empty?
+      unless changes.changed_columns.empty?
         log "--- Mutative changes for #{table_name}"
       end
 
@@ -116,17 +102,6 @@ private
         log " ~c #{name}:#{column.type}"
         run :change_column, table_name, name, column.type, column.options
       end
-
-      changes.changed_indexes.each do |name|
-        index = future_table.indexes[name]
-
-        log(index.options[:unique]       ?
-            " ~u #{index.columns * ' '}" :
-            " ~i #{index.columns * ' '}" )
-
-        run :remove_index, table_name, {:name => name}
-        run :add_index, table_name, index.columns, index.options
-      end
     end
 
     # old columns
@@ -134,17 +109,8 @@ private
       changes       = @changes.table(table_name)
       current_table = @current.tables[table_name]
 
-      unless changes.old_columns.empty? and changes.old_indexes.empty?
+      unless changes.old_columns.empty?
         log "--- Destructive changes for #{table_name}"
-      end
-
-      changes.old_indexes.each do |name|
-        index = current_table.indexes[name]
-
-        log(index.options[:unique]       ?
-            " -u #{index.columns * ' '}" :
-            " -i #{index.columns * ' '}" )
-        run :remove_index, table_name, {:name => name}
       end
 
       changes.old_columns.each do |name|
@@ -160,6 +126,81 @@ private
     @changes.old_tables.each do |table_name|
       log "-- Dropping table #{table_name}"
       run :drop_table, table_name
+    end
+  end
+
+  def remove_old_indexes
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      current_table = @current.tables[table_name]
+
+      changes.old_indexes.each do |name|
+        index = current_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " -u #{index.columns * ' '}" :
+            " -i #{index.columns * ' '}" )
+        run :remove_index, table_name, {:name => name}
+      end
+    end
+
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      future_table  = @future.tables[table_name]
+
+      changes.changed_indexes.each do |name|
+        index = future_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " ~u #{index.columns * ' '}" :
+            " ~i #{index.columns * ' '}" )
+
+        run :remove_index, table_name, {:name => name}
+      end
+    end
+  end
+
+  def create_new_indexes
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      future_table  = @future.tables[table_name]
+
+      changes.changed_indexes.each do |name|
+        index = future_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " ~u #{index.columns * ' '}" :
+            " ~i #{index.columns * ' '}" )
+
+        run :add_index, table_name, index.columns, index.options
+      end
+    end
+
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      future_table  = @future.tables[table_name]
+
+      changes.new_indexes.each do |name|
+        index = future_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " +u #{index.columns * ' '}" :
+            " +i #{index.columns * ' '}" )
+
+        run :add_index, table_name, index.columns, index.options
+      end
+    end
+
+    @changes.new_tables.each do |table_name|
+      table = @future.tables[table_name]
+
+      table.indexes.each do |name, index|
+        log(index.options[:unique]       ?
+            " +u #{index.columns * ' '}" :
+            " +i #{index.columns * ' '}" )
+
+        run :add_index, table_name, index.columns, index.options
+      end
     end
   end
 
