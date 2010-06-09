@@ -95,8 +95,8 @@ class Transitions::MigrationTest < ActiveSupport::TestCase
         :name=>"index_pages_on_published_at"}],
       [:add_index, "posts", ["title"], {:unique=>true,
         :name=>"index_posts_on_title"}],
-      [:add_index, "posts", ["posted_at"], {
-        :name=>"index_posts_on_posted_at"}],
+      # [:add_index, "posts", ["posted_at"], {
+      #   :name=>"index_posts_on_posted_at"}],
       [:add_index, "comments", ["post_id"], {
         :name=>"index_comments_on_post_id"}],
       [:add_index, "comments", ["user_id"], {
