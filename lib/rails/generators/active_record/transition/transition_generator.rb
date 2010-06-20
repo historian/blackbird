@@ -6,7 +6,7 @@ Rails::Generators::ModelGenerator.hook_for :transition,
 
 module ActiveRecord
   module Generators
-    class Transition::Generator < Rails::Generators::NamedBase
+    class TransitionGenerator < Rails::Generators::NamedBase
       argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
 
       def self.source_root

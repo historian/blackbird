@@ -17,7 +17,7 @@ class Transitions::Railtie < Rails::Railtie
 
   initializer "transitions.find_fragments" do |app|
     unless config.transitions.fragments
-      config.transitions.schemas = []
+      config.transitions.fragments = []
       railties = [app.railties.all, app].flatten
       railties.each do |railtie|
         next unless railtie.respond_to? :paths
