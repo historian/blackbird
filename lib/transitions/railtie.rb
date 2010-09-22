@@ -4,6 +4,9 @@ class Transitions::Railtie < Rails::Railtie
   config.transitions.verbose  = true
   config.transitions.auto_run = false
   config.transitions.fragments  = nil
+  config.transitions.processors = Transitions::ProcessorList.new
+  config.transitions.processors.use 'Transitions::Processors::IndexedColumns'
+  config.transitions.processors.use 'Transitions::Processors::NormalDefault'
 
   config.generators.orm :active_record, :migration => false, :timestamps => true
 
@@ -13,6 +16,7 @@ class Transitions::Railtie < Rails::Railtie
 
   initializer "transitions.setup_configuration" do |app|
     Transitions.options[:verbose] = app.config.transitions.verbose
+    Transitions.options[:processors] = app.config.transitions.processors
   end
 
   initializer "transitions.find_fragments" do |app|

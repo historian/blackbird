@@ -37,6 +37,7 @@ class Transitions::Table::Changes
     @changed_indexes = []
     (current_indexes.keys & future_indexes.keys).each do |name|
       if current_indexes[name] != future_indexes[name]
+        p [name, current_indexes[name], future_indexes[name]]
         @changed_indexes << name
       end
     end

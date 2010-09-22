@@ -6,6 +6,12 @@ class Transitions::Column
     @name, @type, @options = name.to_s, type, options
   end
 
+  def process(visitor)
+    if visitor.respond_to?(:visit_column)
+      visitor.visit_column(self)
+    end
+  end
+
   def primary?
     !!@options[:primary]
   end

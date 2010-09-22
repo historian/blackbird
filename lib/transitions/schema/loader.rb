@@ -27,8 +27,10 @@ class Transitions::Schema::Loader
 
           options = {}
 
-          if !column.null.nil? and !column.null
+          if !column.null.nil?
             options[:null] = column.null
+          else
+            options[:null] = true
           end
 
           if column.limit and column.limit != 255

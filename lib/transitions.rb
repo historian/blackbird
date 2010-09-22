@@ -6,6 +6,7 @@ module Transitions
 
   require 'transitions/transition'
   require 'transitions/migration'
+  require 'transitions/processor_list'
 
   require 'transitions/fragment'
   require 'transitions/schema'
@@ -14,12 +15,18 @@ module Transitions
   require 'transitions/index'
   require 'transitions/patch'
 
-  if defined?(::Rails::Railtie)
-    require 'transitions/railtie'
+  module Processors
+    require 'transitions/processors/indexed_columns'
+    require 'transitions/processors/normal_default'
   end
 
+  require 'transitions/railtie'
+
   def self.options
-    @options ||= { :verbose => true }
+    @options ||= {
+      :verbose => true,
+      :processors => Transitions::ProcessorList.new
+    }
   end
 
 end

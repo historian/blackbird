@@ -1,5 +1,5 @@
-source :gemcutter
-gem "activerecord", ">= 2.3.4"
+source :rubygems
+gemspec
 
 group :development do
   gem "shoulda", ">= 2.10.3"

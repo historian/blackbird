@@ -90,6 +90,7 @@ private
     # column changes
     @changes.changed_tables.each do |table_name|
       changes       = @changes.table(table_name)
+      current_table = @current.tables[table_name]
       future_table  = @future.tables[table_name]
 
       unless changes.changed_columns.empty?
@@ -99,7 +100,7 @@ private
       changes.changed_columns.each do |name|
         column = future_table.columns[name]
 
-        log " ~c #{name}:#{column.type}"
+        log " ~c #{name}:#{column.type} #{current_table.columns[name].options.inspect} => #{column.options.inspect}"
         run :change_column, table_name, name, column.type, column.options
       end
     end

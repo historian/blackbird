@@ -2,7 +2,6 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'bundler'
 require 'transitions/version'
 
 Gem::Specification.new do |s|
@@ -22,5 +21,5 @@ Gem::Specification.new do |s|
   s.files        = Dir.glob("{lib}/**/*") +
                    %w(LICENSE README.md ROADMAP.md CHANGELOG.md)
 
-  s.add_bundler_dependencies
+  s.add_runtime_dependency "activerecord", ">= 3.0.0"
 end

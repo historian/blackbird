@@ -16,6 +16,20 @@ class Transitions::Table
     end
   end
 
+  def process(visitor)
+    if visitor.respond_to?(:visit_table)
+      visitor.visit_table(self)
+    end
+
+    @columns.values.dup.each do |column|
+      column.process(visitor)
+    end
+
+    @indexes.values.dup.each do |index|
+      index.process(visitor)
+    end
+  end
+
   def hash
     [@name, @options, @columns, @indexes].hash
   end
@@ -28,23 +42,20 @@ class Transitions::Table
   end
 
   def add_column(name, type, options={})
-    add_indexes_for_options(name, options)
-
     column = Transitions::Column.new(name, type, options)
     @columns[column.name] = column
   end
 
   def remove_column(name)
-    @columns.delete(name.to_s)
+    column = @columns.delete(name.to_s)
     @indexes.values.each do |index|
       index.columns.delete(name.to_s)
       remove_index(index.options[:name]) if index.columns.empty?
     end
+    column
   end
 
   def change_column(name, type, options={})
-    add_indexes_for_options(name, options)
-
     @columns[name.to_s].change(type, options)
   end
 
@@ -55,20 +66,6 @@ class Transitions::Table
 
   def remove_index(name)
     @indexes.delete(name.to_s)
-  end
-
-private
-
-  def add_indexes_for_options(column, options={})
-    if unique = options.delete(:unique)
-      index_columns = [options.delete(:scope)].flatten.compact
-      index_columns << column
-      add_index(index_columns, :unique => true)
-    end
-
-    if options.delete(:index)
-      add_index(column)
-    end
   end
 
 end

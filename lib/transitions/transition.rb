@@ -66,6 +66,10 @@ private
       @fragments[fragment.class] = fragment
       fragment.apply(builder)
     end
+
+    Transitions.options[:processors].build.each do |processor|
+      @future.process processor
+    end
   end
 
   def analyze_changes

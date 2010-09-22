@@ -1,5 +1,6 @@
 require 'rubygems'
-require 'shoulda'
+require 'rails/all'
+$:.unshift(File.expand_path('../../lib', __FILE__))
 require 'transitions'
 require 'fileutils'
 
@@ -38,8 +39,8 @@ ActiveRecord::Schema.define do
   ActiveRecord::Base.connection.execute('INSERT INTO users (id, full_name) VALUES (2, "Yves")')
 end
 
-class ActiveSupport::TestCase
-  def reset_connection
+def reset_connection
+  before(:each) do
     tmp = File.expand_path('../../tmp', __FILE__)
     FileUtils.rm_f(tmp+'/test_real.db')
     FileUtils.cp(tmp+'/test.db', tmp+'/test_real.db')
@@ -52,7 +53,9 @@ class ActiveSupport::TestCase
 end
 
 Transitions.options[:verbose] = false
+Transitions.options[:processors].use 'Transitions::Processors::IndexedColumns'
+Transitions.options[:processors].use 'Transitions::Processors::NormalDefault'
 
 FRAGMENT_PATHS = (
-  Dir.glob(File.expand_path('../fixtures/a/**/*_fragment.rb', __FILE__)) +
-  Dir.glob(File.expand_path('../fixtures/b/**/*_fragment.rb', __FILE__)) )
+  Dir.glob(File.expand_path('../fixtures/a/*_fragment.rb', __FILE__)) +
+  Dir.glob(File.expand_path('../fixtures/b/*_fragment.rb', __FILE__)) )

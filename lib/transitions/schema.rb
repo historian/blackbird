@@ -12,4 +12,14 @@ class Transitions::Schema
     @patches = ActiveSupport::OrderedHash.new
   end
 
+  def process(visitor)
+    if visitor.respond_to?(:visit_schema)
+      visitor.visit_schema(self)
+    end
+
+    @tables.values.dup.each do |table|
+      table.process(visitor)
+    end
+  end
+
 end
