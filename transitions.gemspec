@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path("../lib/opts/version", __FILE__)
+require File.expand_path("../lib/transitions/version", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "transitions"
