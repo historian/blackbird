@@ -16,6 +16,7 @@ ActiveRecord::Schema.define do
   create_table "posts", :force => true do |t|
     t.column "title", :string
     t.column "body",  :text
+    t.column "published_at", :datetime
   end
 
   create_table "pages", :force => true do |t|
@@ -52,6 +53,6 @@ end
 
 Transitions.options[:verbose] = false
 
-SCHEMA_PATHS = (
-  Dir.glob(File.expand_path('../fixtures/a/**/*_schema.rb', __FILE__)) +
-  Dir.glob(File.expand_path('../fixtures/b/**/*_schema.rb', __FILE__)) )
+FRAGMENT_PATHS = (
+  Dir.glob(File.expand_path('../fixtures/a/**/*_fragment.rb', __FILE__)) +
+  Dir.glob(File.expand_path('../fixtures/b/**/*_fragment.rb', __FILE__)) )

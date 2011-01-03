@@ -1,4 +1,4 @@
-class PagesSchema < Transitions::Schema
+class PagesFragment < Transitions::Fragment
 
   table :pages do |t|
     t.string   :title, :index => true

@@ -4,7 +4,7 @@ class Transitions::SchemaLoaderTest < ActiveSupport::TestCase
 
   setup do
     reset_connection
-    @schema = Transitions::SchemaLoader.load
+    @schema = Transitions::Schema::Loader.load
   end
 
   context "table called 'posts'" do
@@ -34,10 +34,6 @@ class Transitions::SchemaLoaderTest < ActiveSupport::TestCase
     should "have column called 'title'" do
       assert @table.columns.key?('title')
       assert_equal @table.columns['title'].type, :string
-    end
-
-    should "not have column called 'published_at'" do
-      assert !@table.columns.key?('published_at')
     end
   end
 

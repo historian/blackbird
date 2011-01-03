@@ -1,7 +1,7 @@
-class Transitions::TableBuilder
+class Transitions::Table::Builder
 
-  def initialize(schema, table)
-    @schema, @table = schema, table
+  def initialize(schema, fragment,  table)
+    @schema, @fragment, @table = schema, fragment, table
   end
 
 
@@ -24,6 +24,23 @@ class Transitions::TableBuilder
 
   def remove_index(name)
     @table.remove_index(name)
+  end
+
+  def rename(old_name, new_name)
+    column = @table.columns[old_name.to_s]
+    self.remove old_name
+    self.column new_name, column.type, column.options
+
+    msg = "Renaming #{@table.name}.#{old_name} to #{@table.name}.#{new_name}"
+    patch = Transitions::Patch.new(@fragment, msg) do |p|
+      t = p.table(@table.name)
+
+      if t.add?(new_name) and t.remove?(old_name)
+        t.rename(old_name, new_name)
+      end
+    end
+    @schema.patches[patch.name] = patch
+
   end
 
 

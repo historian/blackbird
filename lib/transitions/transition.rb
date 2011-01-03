@@ -1,21 +1,22 @@
+# Transitions::Transition is the coordinator of the transition process
 class Transitions::Transition
 
-  def self.run!(*schema_files)
-    build(schema_files).run!
+  def self.run!(*fragment_files)
+    build(fragment_files).run!
   end
 
-  def self.build(*schema_files)
-    new(schema_files).build
+  def self.build(*fragment_files)
+    new(fragment_files).build
   end
 
-  attr_reader :schema_files, :current, :future, :changes, :migration, :schemas
+  attr_reader :fragment_files, :current, :future, :changes, :migration, :fragments
 
-  def initialize(*schema_files)
-    @schema_files = schema_files.flatten.uniq.compact
+  def initialize(*fragment_files)
+    @fragment_files = fragment_files.flatten.uniq.compact
   end
 
   def build
-    load_schema_definitions
+    load_fragments
     load_current
     build_future
     analyze_changes
@@ -46,29 +47,29 @@ class Transitions::Transition
 
 private
 
-  def load_schema_definitions
-    @schema_files.each do |path|
+  def load_fragments
+    @fragment_files.each do |path|
       require path
     end
   end
 
   def load_current
-    @current = Transitions::SchemaLoader.load
+    @current = Transitions::Schema::Loader.load
   end
 
   def build_future
-    @future = Transitions::SchemaDefinition.new
-    @schemas = ActiveSupport::OrderedHash.new
-    builder = Transitions::SchemaBuilder.new(@future)
-    Transitions::Schema.subclasses.each do |schema|
-      schema = schema.new
-      @schemas[schema.class] = schema
-      schema.apply(builder)
+    @future = Transitions::Schema.new
+    @fragments = ActiveSupport::OrderedHash.new
+    builder = Transitions::Schema::Builder.new(@future)
+    Transitions::Fragment.subclasses.each do |fragment|
+      fragment = fragment.new
+      @fragments[fragment.class] = fragment
+      fragment.apply(builder)
     end
   end
 
   def analyze_changes
-    @changes = Transitions::SchemaChanges.analyze!(@current, @future)
+    @changes = Transitions::Schema::Changes.analyze!(@current, @future)
   end
 
   def build_migration

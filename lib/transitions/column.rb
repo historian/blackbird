@@ -1,4 +1,4 @@
-class Transitions::ColumnDefinition
+class Transitions::Column
 
   attr_reader :name, :type, :options
 
@@ -19,7 +19,7 @@ class Transitions::ColumnDefinition
   end
 
   def ==(other)
-    self.class === other and @name == other.name and @type == other.type and @options == other.options
+    self.hash == other.hash
   end
 
 end

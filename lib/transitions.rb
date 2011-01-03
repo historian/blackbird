@@ -5,23 +5,16 @@ module Transitions
   require 'transitions/version'
 
   require 'transitions/transition'
-  require 'transitions/schema_loader'
   require 'transitions/migration'
+
+  require 'transitions/fragment'
+  require 'transitions/schema'
+  require 'transitions/table'
+  require 'transitions/column'
+  require 'transitions/index'
   require 'transitions/patch'
 
-  require 'transitions/schema'
-  require 'transitions/schema_builder'
-  require 'transitions/schema_changes'
-  require 'transitions/schema_definition'
-
-  require 'transitions/table_builder'
-  require 'transitions/table_changes'
-  require 'transitions/table_definition'
-
-  require 'transitions/column_definition'
-  require 'transitions/index_definition'
-
-  if defined?(Rails::Railtie)
+  if defined?(::Rails::Railtie)
     require 'transitions/railtie'
   end
 

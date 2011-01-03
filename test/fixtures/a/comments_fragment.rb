@@ -1,4 +1,4 @@
-class CommentsSchema < Transitions::Schema
+class CommentsFragment < Transitions::Fragment
 
   table :comments do |t|
     t.integer  :post_id, :index => true

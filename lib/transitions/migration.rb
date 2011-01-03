@@ -1,3 +1,4 @@
+# Transitions::Migration is responsible for creating database instructions
 class Transitions::Migration
 
   attr_reader :instructions
@@ -12,9 +13,15 @@ class Transitions::Migration
   end
 
   def build
+    evaluate_patches
+
+    remove_old_indexes
+
     create_new_tables
     change_existing_tables
     remove_old_tables
+
+    create_new_indexes
 
     self
   end
@@ -28,51 +35,33 @@ private
       pk_name = table.primary_key
       has_pk  = !!pk_name
 
-      if Transitions.options[:verbose]
-        @instructions << [
-          :log, "--- Creating table #{table_name}"]
-      end
-
-      @instructions << [
-        :create_table, table_name, table.options.merge(:id => has_pk, :primary_key => pk_name)]
+      log "--- Creating table #{table_name}"
+      run :create_table, table_name, table.options.merge(:id => has_pk, :primary_key => pk_name)
 
       table.columns.each do |name, column|
         next if name == pk_name
 
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, " +c #{name}:#{column.type}"]
-        end
-
-        @instructions << [
-          :add_column, table_name, name, column.type, column.options]
-      end
-
-      table.indexes.each do |name, index|
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, (index.options[:unique] ?
-                    " +u #{index.columns * ' '}" :
-                    " +i #{index.columns * ' '}" )]
-        end
-
-        @instructions << [
-          :add_index, table_name, index.columns, index.options]
+        log " +c #{name}:#{column.type}"
+        run :add_column, table_name, name, column.type, column.options
       end
     end
   end
 
-  def apply_patches
+  def evaluate_patches
+    @evaluated_patches = []
     @changes.new_patches.each do |patch_name|
-
-      if Transitions.options[:verbose]
-        @instructions << [
-          :log, "--- Applying patch #{patch.name}"]
-      end
 
       patch = @future.patches[patch_name]
       patch.call(@changes)
+      @evaluated_patches << patch
 
+    end
+  end
+
+  def apply_patches
+    @evaluated_patches.each do |patch|
+
+      log "--- Applying patch #{patch.name}"
       @instructions.concat(patch.instructions)
 
     end
@@ -84,37 +73,15 @@ private
       changes       = @changes.table(table_name)
       future_table  = @future.tables[table_name]
 
-      if Transitions.options[:verbose]
-        unless changes.new_columns.empty? and changes.new_indexes.empty?
-          @instructions << [
-            :log, "--- Constructive changes for #{table_name}"]
-        end
+      unless changes.new_columns.empty?
+        log "--- Constructive changes for #{table_name}"
       end
 
       changes.new_columns.each do |name|
         column = future_table.columns[name]
 
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, " +c #{name}:#{column.type}"]
-        end
-
-        @instructions << [
-          :add_column, table_name, name, column.type, column.options]
-      end
-
-      changes.new_indexes.each do |name|
-        index = future_table.indexes[name]
-
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, (index.options[:unique] ?
-                    " +u #{index.columns * ' '}" :
-                    " +i #{index.columns * ' '}" )]
-        end
-
-        @instructions << [
-          :add_index, table_name, index.columns, index.options]
+        log " +c #{name}:#{column.type}"
+        run :add_column, table_name, name, column.type, column.options
       end
     end
 
@@ -125,39 +92,15 @@ private
       changes       = @changes.table(table_name)
       future_table  = @future.tables[table_name]
 
-      if Transitions.options[:verbose]
-        unless changes.changed_columns.empty? and changes.changed_indexes.empty?
-          @instructions << [
-            :log, "--- Mutative changes for #{table_name}"]
-        end
+      unless changes.changed_columns.empty?
+        log "--- Mutative changes for #{table_name}"
       end
 
       changes.changed_columns.each do |name|
         column = future_table.columns[name]
 
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, " ~c #{name}:#{column.type}"]
-        end
-
-        @instructions << [
-          :change_column, table_name, name, column.type, column.options]
-      end
-
-      changes.changed_indexes.each do |name|
-        index = future_table.indexes[name]
-
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, (index.options[:unique] ?
-                  " ~u #{index.columns * ' '}" :
-                  " ~i #{index.columns * ' '}" )]
-        end
-
-        @instructions << [
-          :remove_index, table_name, {:name => name}]
-        @instructions << [
-          :add_index, table_name, index.columns, index.options]
+        log " ~c #{name}:#{column.type}"
+        run :change_column, table_name, name, column.type, column.options
       end
     end
 
@@ -166,50 +109,108 @@ private
       changes       = @changes.table(table_name)
       current_table = @current.tables[table_name]
 
-      if Transitions.options[:verbose]
-        unless changes.old_columns.empty? and changes.old_indexes.empty?
-          @instructions << [
-            :log, "--- Destructive changes for #{table_name}"]
-        end
-      end
-
-      changes.old_indexes.each do |name|
-        index = current_table.indexes[name]
-
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, (index.options[:unique] ?
-                    " -u #{index.columns * ' '}" :
-                    " -i #{index.columns * ' '}" )]
-        end
-
-        @instructions << [
-          :remove_index, table_name, {:name => name}]
+      unless changes.old_columns.empty?
+        log "--- Destructive changes for #{table_name}"
       end
 
       changes.old_columns.each do |name|
         column = current_table.columns[name]
 
-        if Transitions.options[:verbose]
-          @instructions << [
-            :log, " -c #{name}:#{column.type}"]
-        end
-
-        @instructions << [
-          :remove_column, table_name, name]
+        log " -c #{name}:#{column.type}"
+        run :remove_column, table_name, name
       end
     end
   end
 
   def remove_old_tables
     @changes.old_tables.each do |table_name|
-      if Transitions.options[:verbose]
-        @instructions << [
-          :log, "-- Dropping table #{table_name}"]
-      end
+      log "-- Dropping table #{table_name}"
+      run :drop_table, table_name
+    end
+  end
 
-      @instructions << [
-        :drop_table, table_name]
+  def remove_old_indexes
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      current_table = @current.tables[table_name]
+
+      changes.old_indexes.each do |name|
+        index = current_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " -u #{index.columns * ' '}" :
+            " -i #{index.columns * ' '}" )
+        run :remove_index, table_name, {:name => name}
+      end
+    end
+
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      future_table  = @future.tables[table_name]
+
+      changes.changed_indexes.each do |name|
+        index = future_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " ~u #{index.columns * ' '}" :
+            " ~i #{index.columns * ' '}" )
+
+        run :remove_index, table_name, {:name => name}
+      end
+    end
+  end
+
+  def create_new_indexes
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      future_table  = @future.tables[table_name]
+
+      changes.changed_indexes.each do |name|
+        index = future_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " ~u #{index.columns * ' '}" :
+            " ~i #{index.columns * ' '}" )
+
+        run :add_index, table_name, index.columns, index.options
+      end
+    end
+
+    @changes.changed_tables.each do |table_name|
+      changes       = @changes.table(table_name)
+      future_table  = @future.tables[table_name]
+
+      changes.new_indexes.each do |name|
+        index = future_table.indexes[name]
+
+        log(index.options[:unique]       ?
+            " +u #{index.columns * ' '}" :
+            " +i #{index.columns * ' '}" )
+
+        run :add_index, table_name, index.columns, index.options
+      end
+    end
+
+    @changes.new_tables.each do |table_name|
+      table = @future.tables[table_name]
+
+      table.indexes.each do |name, index|
+        log(index.options[:unique]       ?
+            " +u #{index.columns * ' '}" :
+            " +i #{index.columns * ' '}" )
+
+        run :add_index, table_name, index.columns, index.options
+      end
+    end
+  end
+
+  def run(*instruction)
+    @instructions << instruction
+  end
+
+  def log(message)
+    if Transitions.options[:verbose]
+      run :log, message
     end
   end
 
