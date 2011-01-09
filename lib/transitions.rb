@@ -20,6 +20,11 @@ module Transitions
     require 'transitions/processors/normal_default'
   end
 
+  module Helpers
+    require 'transitions/helpers/typed_columns'
+    require 'transitions/helpers/join_tables'
+  end
+
   require 'transitions/railtie'
 
   def self.options

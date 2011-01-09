@@ -4,7 +4,6 @@ class Transitions::Table::Builder
     @schema, @fragment, @table = schema, fragment, table
   end
 
-
   ##
   # Scope a number of column definitions. All the column and index
   # options can be passed here. also :prefix and :suffix can be passed
@@ -118,54 +117,8 @@ class Transitions::Table::Builder
     @schema.patches[patch.name] = patch
   end
 
-
-  def integer(name, options={})
-    column(name, :integer, options)
-  end
-
-  def float(name, options={})
-    column(name, :float, options)
-  end
-
-  def decimal(name, options={})
-    column(name, :decimal, options)
-  end
-
-  def string(name, options={})
-    column(name, :string, options)
-  end
-
-  def text(name, options={})
-    column(name, :text, options)
-  end
-
-  def boolean(name, options={})
-    column(name, :boolean, options)
-  end
-
-  def binary(name, options={})
-    column(name, :binary, options)
-  end
-
-  def datetime(name, options={})
-    column(name, :datetime, options)
-  end
-
-  def date(name, options={})
-    column(name, :date, options)
-  end
-
-  def timestamp(name, options={})
-    column(name, :timestamp, options)
-  end
-
   def remove(name)
     remove_column name
-  end
-
-  def timestamps
-    datetime :created_at
-    datetime :updated_at
   end
 
 end

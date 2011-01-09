@@ -20,6 +20,8 @@ ActiveRecord::Schema.define do
     t.column "published_at", :datetime
   end
 
+  add_index "posts", "published_at"
+  
   create_table "pages", :force => true do |t|
     t.column "title", :string
     t.column "body",  :string

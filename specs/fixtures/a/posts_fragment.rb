@@ -6,4 +6,6 @@ class PostsFragment < Transitions::Fragment
     datetime :published_at, :index => true
   end
 
+  join(:posts, :users)
+
 end
