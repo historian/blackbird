@@ -1,8 +1,5 @@
 # -*- encoding: utf-8 -*-
-lib = File.expand_path('../lib/', __FILE__)
-$:.unshift lib unless $:.include?(lib)
-
-require 'transitions/version'
+require File.expand_path("../lib/transitions/version", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "transitions"
@@ -17,9 +14,11 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "transitions"
 
-  s.require_path = 'lib'
-  s.files        = Dir.glob("{lib}/**/*") +
-                   %w(LICENSE README.md ROADMAP.md CHANGELOG.md)
-
+  s.add_development_dependency "bundler", ">= 1.0.0"
+  s.add_development_dependency "shoulda", ">= 2.10.3"
   s.add_runtime_dependency "activerecord", ">= 3.0.0"
+
+  s.files        = `git ls-files`.split("\n")
+  s.executables  = `git ls-files`.split("\n").map{|f| f =~ /^bin\/(.*)/ ? $1 : nil}.compact
+  s.require_path = 'lib'
 end
