@@ -42,7 +42,7 @@ private
         next if name == pk_name
 
         log " +c #{name}:#{column.type}"
-        run :add_column, table_name, name, column.type, column.options
+        run :add_column, table_name, name, column.type, column.clean_options
       end
     end
   end
@@ -81,7 +81,7 @@ private
         column = future_table.columns[name]
 
         log " +c #{name}:#{column.type}"
-        run :add_column, table_name, name, column.type, column.options
+        run :add_column, table_name, name, column.type, column.clean_options
       end
     end
 
@@ -100,7 +100,7 @@ private
         column = future_table.columns[name]
 
         log " ~c #{name}:#{column.type}"
-        run :change_column, table_name, name, column.type, column.options
+        run :change_column, table_name, name, column.type, column.clean_options
       end
     end
 

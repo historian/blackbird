@@ -60,13 +60,13 @@ class Transitions::Table
 private
 
   def add_indexes_for_options(column, options={})
-    if unique = options.delete(:unique)
-      index_columns = [options.delete(:scope)].flatten.compact
+    if unique = options[:unique]
+      index_columns = [options[:scope]].flatten.compact
       index_columns << column
       add_index(index_columns, :unique => true)
     end
 
-    if options.delete(:index)
+    if options[:index]
       add_index(column)
     end
   end

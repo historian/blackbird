@@ -35,6 +35,8 @@ class Transitions::Transition
           instruction.last.call
         when :log
           puts instruction.last if Transitions.options[:verbose]
+        when :create_table
+          connection.__send__(*instruction) {}
         else
           connection.__send__(*instruction)
         end

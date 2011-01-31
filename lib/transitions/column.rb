@@ -6,12 +6,16 @@ class Transitions::Column
     @name, @type, @options = name.to_s, type, options
   end
 
+  def clean_options
+    @options.except(:index, :unique, :scope)
+  end
+
   def primary?
     !!@options[:primary]
   end
 
   def hash
-    [@name, @type, @options].hash
+    [@name, @type, clean_options].hash
   end
 
   def change(type, options={})

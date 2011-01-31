@@ -1,7 +1,20 @@
 require 'rubygems'
-require 'shoulda'
+
+case ENV['RAILS_VERSION']
+when '3.0', nil
+  gem 'activerecord', '~> 3.0.0'
+when '2.3'
+  gem 'activerecord', '~> 2.3.0'
+else
+  gem 'activerecord', ENV['RAILS_VERSION']
+end
+
+
 require 'transitions'
 require 'fileutils'
+require 'pp'
+
+puts "Running with ActiveRecord version #{ActiveRecord::VERSION::STRING}"
 
 tmp = File.expand_path('../../tmp', __FILE__)
 FileUtils.mkdir_p(tmp)
@@ -38,17 +51,16 @@ ActiveRecord::Schema.define do
   ActiveRecord::Base.connection.execute('INSERT INTO users (id, full_name) VALUES (2, "Yves")')
 end
 
-class ActiveSupport::TestCase
-  def reset_connection
-    tmp = File.expand_path('../../tmp', __FILE__)
-    FileUtils.rm_f(tmp+'/test_real.db')
-    FileUtils.cp(tmp+'/test.db', tmp+'/test_real.db')
 
-    ActiveRecord::Base.establish_connection({
-      :adapter => 'sqlite3',
-      :database => tmp+'/test_real.db'
-    })
-  end
+def reset_connection
+  tmp = File.expand_path('../../tmp', __FILE__)
+  FileUtils.rm_f(tmp+'/test_real.db')
+  FileUtils.cp(tmp+'/test.db', tmp+'/test_real.db')
+
+  ActiveRecord::Base.establish_connection({
+    :adapter => 'sqlite3',
+    :database => tmp+'/test_real.db'
+  })
 end
 
 Transitions.options[:verbose] = false
