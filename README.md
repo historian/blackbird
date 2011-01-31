@@ -8,11 +8,6 @@ The major advantage of Transitions over migrations is that it allows Rails engin
 
 ### Using Ruby gems
 
-Install the gem:
-
-    #!/usr/bin/env bash
-    $ gem install transitions
-
 Add the gem to your `Gemfile`
 
     gem "rails", "3.0.0.beta3"

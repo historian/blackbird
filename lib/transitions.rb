@@ -25,7 +25,9 @@ module Transitions
     require 'transitions/helpers/join_tables'
   end
 
-  require 'transitions/railtie'
+  if defined? ::Rails::Railtie
+    require 'transitions/railtie'
+  end
 
   def self.options
     @options ||= {

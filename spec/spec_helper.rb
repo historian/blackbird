@@ -1,8 +1,19 @@
 require 'rubygems'
-require 'rails/all'
-$:.unshift(File.expand_path('../../lib', __FILE__))
+
+case ENV['RAILS_VERSION']
+when '3.0', nil
+  gem 'activerecord', '~> 3.0.0'
+when '2.3'
+  gem 'activerecord', '~> 2.3.0'
+else
+  gem 'activerecord', ENV['RAILS_VERSION']
+end
+
 require 'transitions'
 require 'fileutils'
+require 'pp'
+
+puts "Running with ActiveRecord version #{ActiveRecord::VERSION::STRING}"
 
 tmp = File.expand_path('../../tmp', __FILE__)
 FileUtils.mkdir_p(tmp)
@@ -20,8 +31,6 @@ ActiveRecord::Schema.define do
     t.column "published_at", :datetime
   end
 
-  add_index "posts", "published_at"
-  
   create_table "pages", :force => true do |t|
     t.column "title", :string
     t.column "body",  :string
@@ -41,23 +50,23 @@ ActiveRecord::Schema.define do
   ActiveRecord::Base.connection.execute('INSERT INTO users (id, full_name) VALUES (2, "Yves")')
 end
 
-def reset_connection
-  before(:each) do
-    tmp = File.expand_path('../../tmp', __FILE__)
-    FileUtils.rm_f(tmp+'/test_real.db')
-    FileUtils.cp(tmp+'/test.db', tmp+'/test_real.db')
 
-    ActiveRecord::Base.establish_connection({
-      :adapter => 'sqlite3',
-      :database => tmp+'/test_real.db'
-    })
-  end
+def reset_connection
+  tmp = File.expand_path('../../tmp', __FILE__)
+  FileUtils.rm_f(tmp+'/test_real.db')
+  FileUtils.cp(tmp+'/test.db', tmp+'/test_real.db')
+
+  ActiveRecord::Base.establish_connection({
+    :adapter => 'sqlite3',
+    :database => tmp+'/test_real.db'
+  })
 end
 
 Transitions.options[:verbose] = false
+Transitions.options[:processors] = Transitions::ProcessorList.new
 Transitions.options[:processors].use 'Transitions::Processors::IndexedColumns'
 Transitions.options[:processors].use 'Transitions::Processors::NormalDefault'
 
 FRAGMENT_PATHS = (
-  Dir.glob(File.expand_path('../fixtures/a/*_fragment.rb', __FILE__)) +
-  Dir.glob(File.expand_path('../fixtures/b/*_fragment.rb', __FILE__)) )
+  Dir.glob(File.expand_path('../fixtures/a/**/*_fragment.rb', __FILE__)) +
+  Dir.glob(File.expand_path('../fixtures/b/**/*_fragment.rb', __FILE__)) )

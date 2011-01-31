@@ -2,7 +2,7 @@
 
 Features:
 
-  - [nonoe]
+  - [none]
 
 Bugfixes:
 
