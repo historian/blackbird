@@ -1,4 +1,4 @@
-class PostsFragment < Transitions::Fragment
+class PostsFragment < Blackbird::Fragment
 
   table :posts do |t|
     t.string   :title, :unique => true

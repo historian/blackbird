@@ -1,8 +1,8 @@
-class Transitions::Schema
+class Blackbird::Schema
 
-  require 'transitions/schema/loader'
-  require 'transitions/schema/builder'
-  require 'transitions/schema/changes'
+  require 'blackbird/schema/loader'
+  require 'blackbird/schema/builder'
+  require 'blackbird/schema/changes'
 
   attr_reader :tables, :patches
   attr_writer :patches

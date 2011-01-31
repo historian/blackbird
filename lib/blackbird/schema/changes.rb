@@ -1,4 +1,4 @@
-class Transitions::Schema::Changes
+class Blackbird::Schema::Changes
 
   def self.analyze!(current, future)
     new(current, future).analyze!
@@ -14,7 +14,7 @@ class Transitions::Schema::Changes
   def analyze!
     @table_changes = (@current.tables.keys | @future.tables.keys).uniq
     @table_changes = @table_changes.inject({}) do |memo, table_name|
-      memo[table_name] ||= Transitions::Table::Changes.analyze!(
+      memo[table_name] ||= Blackbird::Table::Changes.analyze!(
         @current.tables[table_name], @future.tables[table_name])
       memo
     end

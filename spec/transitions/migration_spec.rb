@@ -1,7 +1,7 @@
-describe 'Transitions::Transition' do
+describe 'Blackbird::Transition' do
   before { reset_connection }
   
-  let(:transition) { Transitions::Transition.build(FRAGMENT_PATHS) }
+  let(:transition) { Blackbird::Transition.build(FRAGMENT_PATHS) }
 
   describe "changes" do
     let(:changes) { transition.changes }

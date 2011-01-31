@@ -1,4 +1,4 @@
-class Transitions::ProcessorList < Array
+class Blackbird::ProcessorList < Array
 
   def use(processor, *args, &block)
     push([processor.to_s, args, block])

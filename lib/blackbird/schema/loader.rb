@@ -1,20 +1,20 @@
-class Transitions::Schema::Loader
+class Blackbird::Schema::Loader
 
   def self.load
     new.load
   end
 
   def load
-    schema = Transitions::Schema.new
-    builder = Transitions::Schema::Builder.new(schema)
+    schema = Blackbird::Schema.new
+    builder = Blackbird::Schema::Builder.new(schema)
 
     schema.patches = []
 
     connection.tables.each do |table|
 
-      if table == 'transitions_patches'
+      if table == 'blackbird_patches'
         schema.patches = connection.select_values(
-          %{ SELECT name FROM transitions_patches })
+          %{ SELECT name FROM blackbird_patches })
       end
 
       pk_name = connection.primary_key(table)

@@ -1,7 +1,7 @@
-describe 'Transitions::Schema::Loader' do
+describe 'Blackbird::Schema::Loader' do
   before { reset_connection }
   
-  let(:schema) { Transitions::Schema::Loader.load }
+  let(:schema) { Blackbird::Schema::Loader.load }
 
   it "has a table called posts" do
     schema.tables.should include('posts')

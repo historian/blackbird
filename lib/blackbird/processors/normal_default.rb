@@ -1,4 +1,4 @@
-class Transitions::Processors::NormalDefault
+class Blackbird::Processors::NormalDefault
 
   def visit_column(column)
     column.options.delete(:default) if column.options[:default].nil?

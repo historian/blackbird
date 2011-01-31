@@ -1,4 +1,4 @@
-class Transitions::Index
+class Blackbird::Index
 
   attr_reader :name, :columns, :options
 

@@ -1,4 +1,4 @@
-module Transitions::Helpers::TypedColumns
+module Blackbird::Helpers::TypedColumns
 
   def integer(name, options={})
     column(name, :integer, options)
@@ -45,6 +45,6 @@ module Transitions::Helpers::TypedColumns
     datetime :updated_at
   end
   
-  Transitions::Table::Builder.send(:include, self)
+  Blackbird::Table::Builder.send(:include, self)
   
 end

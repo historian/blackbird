@@ -1,4 +1,4 @@
-class Transitions::Table::Builder
+class Blackbird::Table::Builder
 
   def initialize(schema, fragment,  table)
     @schema, @fragment, @table = schema, fragment, table
@@ -107,7 +107,7 @@ class Transitions::Table::Builder
     end
     
     msg = "Renaming #{@table.name}.#{old_name} to #{@table.name}.#{new_name}"
-    patch = Transitions::Patch.new(@fragment, msg) do |p|
+    patch = Blackbird::Patch.new(@fragment, msg) do |p|
       t = p.table(@table.name)
 
       if t.add?(new_name) and t.remove?(old_name)

@@ -1,5 +1,5 @@
-# Transitions::Migration is responsible for creating database instructions
-class Transitions::Migration
+# Blackbird::Migration is responsible for creating database instructions
+class Blackbird::Migration
 
   attr_reader :instructions
 
@@ -210,7 +210,7 @@ private
   end
 
   def log(message)
-    if Transitions.options[:verbose]
+    if Blackbird.options[:verbose]
       run :log, message
     end
   end

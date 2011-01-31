@@ -9,7 +9,7 @@ else
   gem 'activerecord', ENV['RAILS_VERSION']
 end
 
-require 'transitions'
+require 'blackbird'
 require 'fileutils'
 require 'pp'
 
@@ -62,10 +62,10 @@ def reset_connection
   })
 end
 
-Transitions.options[:verbose] = false
-Transitions.options[:processors] = Transitions::ProcessorList.new
-Transitions.options[:processors].use 'Transitions::Processors::IndexedColumns'
-Transitions.options[:processors].use 'Transitions::Processors::NormalDefault'
+Blackbird.options[:verbose] = false
+Blackbird.options[:processors] = Blackbird::ProcessorList.new
+Blackbird.options[:processors].use 'Blackbird::Processors::IndexedColumns'
+Blackbird.options[:processors].use 'Blackbird::Processors::NormalDefault'
 
 FRAGMENT_PATHS = (
   Dir.glob(File.expand_path('../fixtures/a/**/*_fragment.rb', __FILE__)) +

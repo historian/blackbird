@@ -1,8 +1,8 @@
-# Transitions
+# Blackbird
 
-Transitions aims to remove traditional ActiveRecord migrations and replace it with DataMapper-like automatic migrations mixed with event based data patching.
+Blackbird aims to remove traditional ActiveRecord migrations and replace it with DataMapper-like automatic migrations mixed with event based data patching.
 
-The major advantage of Transitions over migrations is that it allows Rails engines to define there own schemas which get automatically loaded in the application. The application remains in full control as it can overwrite an engines schema.
+The major advantage of Blackbird over migrations is that it allows Rails engines to define there own schemas which get automatically loaded in the application. The application remains in full control as it can overwrite an engines schema.
 
 ## Installation
 
@@ -11,13 +11,13 @@ The major advantage of Transitions over migrations is that it allows Rails engin
 Add the gem to your `Gemfile`
 
     gem "rails", "3.0.0.beta3"
-    gem "transitions"
+    gem "blackbird"
 
 ### Using git
 
 Add the repo to your `Gemfile`
 
-    gem "transitions", :git => "git://github.com/fd/transitions.git"
+    gem "blackbird", :git => "git://github.com/fd/blackbird.git"
 
 ## Quick Start Guide
 
@@ -27,7 +27,7 @@ Generate a `Post` model without the migration file.
 
 Create a schema file at `app/schemas/posts_schema.rb` with the following contents:
 
-    class PostsSchema < Transitions::Schema
+    class PostsSchema < Blackbird::Schema
 
       table :posts do |t|
         t.string   :title
@@ -58,7 +58,7 @@ and here is the diff:
 
     --- a/app/schemas/posts_schema.rb
     +++ b/app/schemas/posts_schema.rb
-    @@ -4,7 +4,9 @@ class PostsSchema < Transitions::Schema
+    @@ -4,7 +4,9 @@ class PostsSchema < Blackbird::Schema
          t.string   :title
          t.text     :body
 

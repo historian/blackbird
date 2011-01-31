@@ -2,7 +2,7 @@ namespace :db do
 
   desc "Transition to the current schema"
   task :transition => :environment do
-    Transitions::Transition.run!(Rails.application.config.transitions.fragments)
+    Blackbird::Transition.run!(Rails.application.config.blackbird.fragments)
   end
 
 end

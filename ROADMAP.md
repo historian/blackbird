@@ -1,5 +1,5 @@
 ## 0.1.0
 
-  - non destructive transitions
-  - automatic transitions (at application boot)
+  - non destructive blackbird
+  - automatic blackbird (at application boot)
   - rails railtie

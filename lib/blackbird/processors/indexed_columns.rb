@@ -1,4 +1,4 @@
-class Transitions::Processors::IndexedColumns
+class Blackbird::Processors::IndexedColumns
 
   def visit_table(table)
     @current_table = table

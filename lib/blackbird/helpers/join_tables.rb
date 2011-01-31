@@ -1,4 +1,4 @@
-module Transitions::Helpers::JoinTables
+module Blackbird::Helpers::JoinTables
 
   def join(*args, &block)
 
@@ -45,6 +45,6 @@ module Transitions::Helpers::JoinTables
     self
   end
 
-  Transitions::Schema::Builder.send(:include, self)
+  Blackbird::Schema::Builder.send(:include, self)
   
 end
