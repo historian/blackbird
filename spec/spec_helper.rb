@@ -10,7 +10,7 @@ else
 end
 
 
-require 'transitions'
+require 'blackbird'
 require 'fileutils'
 require 'pp'
 
@@ -63,7 +63,7 @@ def reset_connection
   })
 end
 
-Transitions.options[:verbose] = false
+Blackbird.options[:verbose] = false
 
 FRAGMENT_PATHS = (
   Dir.glob(File.expand_path('../fixtures/a/**/*_fragment.rb', __FILE__)) +

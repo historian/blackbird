@@ -1,4 +1,4 @@
-class UsersFragment < Transitions::Fragment
+class UsersFragment < Blackbird::Fragment
 
   table :users do |t|
     t.string :full_name

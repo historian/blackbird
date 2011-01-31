@@ -1,11 +1,11 @@
-class Transitions::Fragment
+class Blackbird::Fragment
 
   def self.subclasses
     @subclasses ||= []
   end
 
   def self.inherited(subclass)
-    Transitions::Fragment.subclasses.push(subclass)
+    Blackbird::Fragment.subclasses.push(subclass)
     subclass.extend InheritanceBlocker
   end
 

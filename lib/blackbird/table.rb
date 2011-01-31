@@ -1,7 +1,7 @@
-class Transitions::Table
+class Blackbird::Table
 
-  require 'transitions/table/builder'
-  require 'transitions/table/changes'
+  require 'blackbird/table/builder'
+  require 'blackbird/table/changes'
 
   attr_reader :name, :options, :columns, :indexes
 
@@ -30,7 +30,7 @@ class Transitions::Table
   def add_column(name, type, options={})
     add_indexes_for_options(name, options)
 
-    column = Transitions::Column.new(name, type, options)
+    column = Blackbird::Column.new(name, type, options)
     @columns[column.name] = column
   end
 
@@ -49,7 +49,7 @@ class Transitions::Table
   end
 
   def add_index(columns, options={})
-    index = Transitions::Index.new(@name, columns, options)
+    index = Blackbird::Index.new(@name, columns, options)
     @indexes[index.name] = index
   end
 

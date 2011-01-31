@@ -1,4 +1,4 @@
-class Transitions::Patch
+class Blackbird::Patch
 
   def initialize(fragment, name, options={}, &block)
     @fragment     = fragment

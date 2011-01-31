@@ -1,4 +1,4 @@
-class CommentsFragment < Transitions::Fragment
+class CommentsFragment < Blackbird::Fragment
 
   table :comments do |t|
     t.integer  :post_id, :index => true

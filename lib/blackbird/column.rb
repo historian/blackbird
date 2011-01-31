@@ -1,8 +1,9 @@
-class Transitions::Column
+class Blackbird::Column
 
   attr_reader :name, :type, :options
 
   def initialize(name, type, options={})
+    options.delete(:default) if options[:default] == nil
     @name, @type, @options = name.to_s, type, options
   end
 

@@ -1,18 +1,18 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path("../lib/transitions/version", __FILE__)
+require File.expand_path("../lib/blackbird/version", __FILE__)
 
 Gem::Specification.new do |s|
-  s.name        = "transitions"
-  s.version     = Transitions::VERSION
+  s.name        = "blackbird"
+  s.version     = Blackbird::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Simon Menke"]
   s.email       = ["simon.menke@gmail.com"]
-  s.homepage    = "http://github.com/fd/transitions"
+  s.homepage    = "http://github.com/fd/blackbird"
   s.summary     = "Migrations should be more adaptable"
-  s.description = "Transitions are Migrations but then better."
+  s.description = "Blackbird make migrations better."
 
   s.required_rubygems_version = ">= 1.3.6"
-  s.rubyforge_project         = "transitions"
+  s.rubyforge_project         = "blackbird"
 
   s.add_runtime_dependency "activerecord", ">= 2.3.4"
 

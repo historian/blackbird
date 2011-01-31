@@ -1,4 +1,4 @@
-class <%= class_name.pluralize %>Fragment < Transitions::Fragment
+class <%= class_name.pluralize %>Fragment < Blackbird::Fragment
 
   table(:<%= class_name.gsub('::', '').underscore.pluralize %>) do |t|
 <% for attribute in attributes -%>

@@ -1,5 +1,5 @@
-# Transitions::Transition is the coordinator of the transition process
-class Transitions::Transition
+# Blackbird::Transition is the coordinator of the transition process
+class Blackbird::Transition
 
   def self.run!(*fragment_files)
     build(fragment_files).run!
@@ -34,7 +34,7 @@ class Transitions::Transition
         when :apply
           instruction.last.call
         when :log
-          puts instruction.last if Transitions.options[:verbose]
+          puts instruction.last if Blackbird.options[:verbose]
         when :create_table
           connection.__send__(*instruction) {}
         else
@@ -56,14 +56,14 @@ private
   end
 
   def load_current
-    @current = Transitions::Schema::Loader.load
+    @current = Blackbird::Schema::Loader.load
   end
 
   def build_future
-    @future = Transitions::Schema.new
+    @future = Blackbird::Schema.new
     @fragments = ActiveSupport::OrderedHash.new
-    builder = Transitions::Schema::Builder.new(@future)
-    Transitions::Fragment.subclasses.each do |fragment|
+    builder = Blackbird::Schema::Builder.new(@future)
+    Blackbird::Fragment.subclasses.each do |fragment|
       fragment = fragment.new
       @fragments[fragment.class] = fragment
       fragment.apply(builder)
@@ -71,11 +71,11 @@ private
   end
 
   def analyze_changes
-    @changes = Transitions::Schema::Changes.analyze!(@current, @future)
+    @changes = Blackbird::Schema::Changes.analyze!(@current, @future)
   end
 
   def build_migration
-    @migration = Transitions::Migration.build(@current, @future, @changes)
+    @migration = Blackbird::Migration.build(@current, @future, @changes)
   end
 
 end
