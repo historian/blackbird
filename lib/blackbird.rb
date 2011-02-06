@@ -35,5 +35,5 @@ module Blackbird
       :processors => Blackbird::ProcessorList.new
     }
   end
-  
+
 end

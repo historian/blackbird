@@ -1,9 +1,10 @@
 class Blackbird::Railtie < Rails::Railtie
 
   config.blackbird = ActiveSupport::OrderedOptions.new
-  config.blackbird.verbose  = true
-  config.blackbird.auto_run = false
+  config.blackbird.verbose    = true
+  config.blackbird.auto_run   = false
   config.blackbird.fragments  = nil
+  config.blackbird.processors = Blackbird::ProcessorList.new
 
   config.generators.orm :active_record, :migration => false, :timestamps => true
 
@@ -12,7 +13,10 @@ class Blackbird::Railtie < Rails::Railtie
   end
 
   initializer "blackbird.setup_configuration" do |app|
-    Blackbird.options[:verbose] = app.config.blackbird.verbose
+    Blackbird.options[:verbose]    = app.config.blackbird.verbose
+    Blackbird.options[:processors] = app.config.blackbird.processors
+    Blackbird.options[:processors].use 'Blackbird::Processors::IndexedColumns'
+    Blackbird.options[:processors].use 'Blackbird::Processors::NormalDefault'
   end
 
   initializer "blackbird.find_fragments" do |app|
