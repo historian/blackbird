@@ -17,6 +17,7 @@ class Blackbird::Transition
 
   def build
     load_fragments
+    prepare_tmp_database
     load_current
     build_future
     analyze_changes
@@ -26,23 +27,57 @@ class Blackbird::Transition
   end
 
   def run!
-    connection = ActiveRecord::Base.connection
-    connection.transaction do
+    last_table  = nil
+    last_inst   = nil
+    last_indent = 0
 
+    puts "class A_Migration < ActiveRecord::Migration"
+    puts "  def self.up"
       @migration.instructions.each do |instruction|
-        case instruction.first
-        when :apply
-          instruction.last.call
-        when :log
-          puts instruction.last if Blackbird.options[:verbose]
-        when :create_table
-          connection.__send__(*instruction) {}
+        current_inst  = instruction[0]
+        current_table = instruction[1]
+
+        if [:create_table, :change_table, :drop_table].include? current_inst
+          current_indent = 0
+          current_args   = instruction[1..-1]
+          args_string    = current_args.inspect[1..-2]
         else
-          connection.__send__(*instruction)
+          current_indent = 1
+          current_args   = instruction[2..-1]
+          args_string    = current_args.inspect[1..-2]
         end
+
+        next if [:apply, :log].include? current_inst
+
+        if current_indent < last_indent
+          puts "    end"
+        elsif current_indent > last_indent and current_table != last_table
+          puts ""
+          puts "    change_table(#{current_table.inspect}) do |t|"
+        end
+
+        if current_indent == 0
+          puts ""
+          if [:create_table, :change_table].include? current_inst
+            puts "    #{current_inst}(#{args_string}) do |t|"
+          else
+            puts "    #{current_inst}(#{args_string})"
+          end
+        else
+          puts "      t.#{current_inst}(#{args_string})"
+        end
+
+        last_inst   = current_inst
+        last_table  = current_table
+        last_indent = current_indent
       end
 
-    end
+      if last_indent > 0
+        puts "    end"
+      end
+      puts ""
+    puts "  end"
+    puts "end"
 
     self
   end
@@ -53,6 +88,19 @@ private
     @fragment_files.each do |path|
       require path
     end
+  end
+
+  def prepare_tmp_database
+    ActiveRecord::Base.establish_connection(
+      :adapter => 'sqlite3', :database => ':memory:')
+
+    ActiveRecord::Migration.verbose = false
+
+    if File.file?("#{Rails.root}/db/schema.rb")
+      load("#{Rails.root}/db/schema.rb")
+    end
+
+    ActiveRecord::Migrator.migrate("db/migrate/", nil)
   end
 
   def load_current
