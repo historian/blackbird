@@ -2,7 +2,6 @@ class Blackbird::Railtie < Rails::Railtie
 
   config.blackbird = ActiveSupport::OrderedOptions.new
   config.blackbird.verbose    = true
-  config.blackbird.auto_run   = false
   config.blackbird.fragments  = nil
   config.blackbird.processors = Blackbird::ProcessorList.new
 
@@ -28,13 +27,6 @@ class Blackbird::Railtie < Rails::Railtie
         config.blackbird.fragments.concat(
           railtie.paths.app.fragments.to_a)
       end
-    end
-  end
-
-  initializer "blackbird.run_blackbird" do |app|
-    if app.config.blackbird.auto_run
-      Blackbird::Transition.run!(
-        config.blackbird.fragments)
     end
   end
 
