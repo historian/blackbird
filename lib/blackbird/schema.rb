@@ -4,12 +4,10 @@ class Blackbird::Schema
   require 'blackbird/schema/builder'
   require 'blackbird/schema/changes'
 
-  attr_reader :tables, :patches
-  attr_writer :patches
+  attr_reader :tables
 
   def initialize
     @tables  = {}
-    @patches = ActiveSupport::OrderedHash.new
   end
 
   def process(visitor)

@@ -49,9 +49,12 @@ class Blackbird::Transition
 
         next if [:apply, :log].include? current_inst
 
-        if current_indent < last_indent
+        if current_indent < last_indent or current_table != last_table
           puts "    end"
-        elsif current_indent > last_indent and current_table != last_table
+          last_indent = 0
+        end
+
+        if current_indent > last_indent and current_table != last_table
           puts ""
           puts "    change_table(#{current_table.inspect}) do |t|"
         end

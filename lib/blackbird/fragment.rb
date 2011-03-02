@@ -17,10 +17,6 @@ class Blackbird::Fragment
     self.instructions << [:table, name, options, block]
   end
 
-  def self.patch(name, options={}, &block)
-    self.instructions << [:patch, name, options, block]
-  end
-
   def initialize
     @instructions = self.class.instructions.dup
   end

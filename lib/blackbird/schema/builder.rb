@@ -18,13 +18,7 @@ class Blackbird::Schema::Builder
         block.call(builder)
       end
     end
-    
-    self
-  end
 
-  def patch(fragment, name, options={}, &block)
-    patch = Blackbird::Patch.new(fragment, name, options, &block)
-    @schema.patches[patch.name] = patch
     self
   end
 
