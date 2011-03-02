@@ -13,7 +13,6 @@ module Blackbird
   require 'blackbird/table'
   require 'blackbird/column'
   require 'blackbird/index'
-  require 'blackbird/patch'
 
   module Processors
     require 'blackbird/processors/indexed_columns'
@@ -23,6 +22,10 @@ module Blackbird
   module Helpers
     require 'blackbird/helpers/typed_columns'
     require 'blackbird/helpers/join_tables'
+  end
+
+  module Fragments
+    require 'blackbird/fragments/schema_migrations_fragment'
   end
 
   if defined? ::Rails::Railtie

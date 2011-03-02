@@ -8,14 +8,7 @@ class Blackbird::Schema::Loader
     schema = Blackbird::Schema.new
     builder = Blackbird::Schema::Builder.new(schema)
 
-    schema.patches = []
-
     connection.tables.each do |table|
-
-      if table == 'blackbird_patches'
-        schema.patches = connection.select_values(
-          %{ SELECT name FROM blackbird_patches })
-      end
 
       pk_name = connection.primary_key(table)
       has_pk  = !!pk_name

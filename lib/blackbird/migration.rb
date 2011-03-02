@@ -13,8 +13,6 @@ class Blackbird::Migration
   end
 
   def build
-    evaluate_patches
-
     remove_old_indexes
 
     create_new_tables
@@ -34,9 +32,12 @@ private
 
       pk_name = table.primary_key
       has_pk  = !!pk_name
+      table_opts = {}
+      table_opts[:id]          = false   if has_pk == false
+      table_opts[:primary_key] = pk_name if pk_name and pk_name != 'id'
 
       log "--- Creating table #{table_name}"
-      run :create_table, table_name, table.options.merge(:id => has_pk, :primary_key => pk_name)
+      run :create_table, table_name, table.options.merge(table_opts)
 
       table.columns.each do |name, column|
         next if name == pk_name
@@ -44,26 +45,6 @@ private
         log " +c #{name}:#{column.type}"
         run :add_column, table_name, name, column.type, column.options
       end
-    end
-  end
-
-  def evaluate_patches
-    @evaluated_patches = []
-    @changes.new_patches.each do |patch_name|
-
-      patch = @future.patches[patch_name]
-      patch.call(@changes)
-      @evaluated_patches << patch
-
-    end
-  end
-
-  def apply_patches
-    @evaluated_patches.each do |patch|
-
-      log "--- Applying patch #{patch.name}"
-      @instructions.concat(patch.instructions)
-
     end
   end
 
@@ -84,8 +65,6 @@ private
         run :add_column, table_name, name, column.type, column.options
       end
     end
-
-    apply_patches
 
     # column changes
     @changes.changed_tables.each do |table_name|
