@@ -20,11 +20,10 @@ class Blackbird::Railtie < Rails::Railtie
 
   initializer "blackbird.find_fragments" do |app|
     unless config.blackbird.fragments
-      config.blackbird.fragments = []
       railties = [app.railties.all, app].flatten
       railties.each do |railtie|
         next unless railtie.respond_to? :paths
-        config.blackbird.fragments.concat(
+        Blackbird.options[:fragments].concat(
           railtie.paths.app.fragments.to_a)
       end
     end

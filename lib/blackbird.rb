@@ -31,8 +31,9 @@ module Blackbird
 
   def self.options
     @options ||= {
-      :verbose => true,
-      :processors => Blackbird::ProcessorList.new
+      :verbose    => true,
+      :processors => Blackbird::ProcessorList.new,
+      :fragments  => []
     }
   end
 
