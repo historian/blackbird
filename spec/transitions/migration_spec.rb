@@ -81,7 +81,6 @@ describe 'Blackbird::Transition' do
       [:add_column, "comments", "posted_at", :datetime, {:null=>true}],
       [:add_column, "comments", "username", :string, {:null=>true}],
       [:add_column, "pages", "published_at", :datetime, {:null=>true}],
-      [:apply, method],
       [:rename_column, "posts", :published_at, :posted_at],
       [:change_column, "pages", "body", :text, {:null=>true}],
       [:remove_column, "pages", "image_id"],

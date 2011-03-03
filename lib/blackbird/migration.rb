@@ -36,13 +36,11 @@ private
       table_opts[:id]          = false   if has_pk == false
       table_opts[:primary_key] = pk_name if pk_name and pk_name != 'id'
 
-      log "--- Creating table #{table_name}"
       run :create_table, table_name, table.options.merge(table_opts)
 
       table.columns.each do |name, column|
         next if name == pk_name
 
-        log " +c #{name}:#{column.type}"
         run :add_column, table_name, name, column.type, column.options
       end
     end
@@ -54,14 +52,9 @@ private
       changes       = @changes.table(table_name)
       future_table  = @future.tables[table_name]
 
-      unless changes.new_columns.empty?
-        log "--- Constructive changes for #{table_name}"
-      end
-
       changes.new_columns.each do |name|
         column = future_table.columns[name]
 
-        log " +c #{name}:#{column.type}"
         run :add_column, table_name, name, column.type, column.options
       end
     end
@@ -72,14 +65,9 @@ private
       current_table = @current.tables[table_name]
       future_table  = @future.tables[table_name]
 
-      unless changes.changed_columns.empty?
-        log "--- Mutative changes for #{table_name}"
-      end
-
       changes.changed_columns.each do |name|
         column = future_table.columns[name]
 
-        log " ~c #{name}:#{column.type} #{current_table.columns[name].options.inspect} => #{column.options.inspect}"
         run :change_column, table_name, name, column.type, column.options
       end
     end
@@ -89,14 +77,9 @@ private
       changes       = @changes.table(table_name)
       current_table = @current.tables[table_name]
 
-      unless changes.old_columns.empty?
-        log "--- Destructive changes for #{table_name}"
-      end
-
       changes.old_columns.each do |name|
         column = current_table.columns[name]
 
-        log " -c #{name}:#{column.type}"
         run :remove_column, table_name, name
       end
     end
@@ -104,7 +87,6 @@ private
 
   def remove_old_tables
     @changes.old_tables.each do |table_name|
-      log "-- Dropping table #{table_name}"
       run :drop_table, table_name
     end
   end
@@ -117,9 +99,6 @@ private
       changes.old_indexes.each do |name|
         index = current_table.indexes[name]
 
-        log(index.options[:unique]       ?
-            " -u #{index.columns * ' '}" :
-            " -i #{index.columns * ' '}" )
         run :remove_index, table_name, {:name => name}
       end
     end
@@ -130,10 +109,6 @@ private
 
       changes.changed_indexes.each do |name|
         index = future_table.indexes[name]
-
-        log(index.options[:unique]       ?
-            " ~u #{index.columns * ' '}" :
-            " ~i #{index.columns * ' '}" )
 
         run :remove_index, table_name, {:name => name}
       end
@@ -148,10 +123,6 @@ private
       changes.changed_indexes.each do |name|
         index = future_table.indexes[name]
 
-        log(index.options[:unique]       ?
-            " ~u #{index.columns * ' '}" :
-            " ~i #{index.columns * ' '}" )
-
         run :add_index, table_name, index.columns, index.options
       end
     end
@@ -163,10 +134,6 @@ private
       changes.new_indexes.each do |name|
         index = future_table.indexes[name]
 
-        log(index.options[:unique]       ?
-            " +u #{index.columns * ' '}" :
-            " +i #{index.columns * ' '}" )
-
         run :add_index, table_name, index.columns, index.options
       end
     end
@@ -175,10 +142,6 @@ private
       table = @future.tables[table_name]
 
       table.indexes.each do |name, index|
-        log(index.options[:unique]       ?
-            " +u #{index.columns * ' '}" :
-            " +i #{index.columns * ' '}" )
-
         run :add_index, table_name, index.columns, index.options
       end
     end
@@ -186,12 +149,6 @@ private
 
   def run(*instruction)
     @instructions << instruction
-  end
-
-  def log(message)
-    if Blackbird.options[:verbose]
-      run :log, message
-    end
   end
 
 end

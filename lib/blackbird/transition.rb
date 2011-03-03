@@ -46,10 +46,8 @@ class Blackbird::Transition
           current_args   = instruction[2..-1]
           args_string    = current_args.inspect[1..-2]
         end
-
-        next if [:apply, :log].include? current_inst
-
-        if current_indent < last_indent or current_table != last_table
+        
+        if (current_indent < last_indent or (current_table != last_table and last_table)) and last_inst != :drop_table
           puts "    end"
           last_indent = 0
         end
@@ -99,9 +97,9 @@ private
 
     ActiveRecord::Migration.verbose = false
 
-    if File.file?("#{Rails.root}/db/schema.rb")
-      load("#{Rails.root}/db/schema.rb")
-    end
+    # if File.file?("#{Rails.root}/db/schema.rb")
+    #   load("#{Rails.root}/db/schema.rb")
+    # end
 
     ActiveRecord::Migrator.migrate("db/migrate/", nil)
   end
