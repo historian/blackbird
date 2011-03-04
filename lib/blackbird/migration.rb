@@ -41,7 +41,7 @@ private
       table.columns.each do |name, column|
         next if name == pk_name
 
-        run :add_column, table_name, name, column.type, column.options
+        run :column, table_name, name, column.type, column.options
       end
     end
   end
@@ -55,7 +55,7 @@ private
       changes.new_columns.each do |name|
         column = future_table.columns[name]
 
-        run :add_column, table_name, name, column.type, column.options
+        run :column, table_name, name, column.type, column.options
       end
     end
 
@@ -68,7 +68,7 @@ private
       changes.changed_columns.each do |name|
         column = future_table.columns[name]
 
-        run :change_column, table_name, name, column.type, column.options
+        run :change, table_name, name, column.type, column.options
       end
     end
 
@@ -80,7 +80,7 @@ private
       changes.old_columns.each do |name|
         column = current_table.columns[name]
 
-        run :remove_column, table_name, name
+        run :remove, table_name, name
       end
     end
   end
@@ -134,7 +134,7 @@ private
       changes.new_indexes.each do |name|
         index = future_table.indexes[name]
 
-        run :add_index, table_name, index.columns, index.options
+        run :index, table_name, index.columns, index.options
       end
     end
 
@@ -142,7 +142,7 @@ private
       table = @future.tables[table_name]
 
       table.indexes.each do |name, index|
-        run :add_index, table_name, index.columns, index.options
+        run :index, table_name, index.columns, index.options
       end
     end
   end

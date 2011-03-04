@@ -27,12 +27,20 @@ class Blackbird::Transition
   end
 
   def run!
+    if @migration.instructions.empty?
+      puts "Nothing changed, no migration was generated."
+      return
+    end
+    
+    migration = StringIO.new
+    timestamp = Time.now.strftime('%Y%m%d%H%M%S')
+    
     last_table  = nil
     last_inst   = nil
     last_indent = 0
 
-    puts "class A_Migration < ActiveRecord::Migration"
-    puts "  def self.up"
+    migration.puts "class T#{timestamp} < ActiveRecord::Migration"
+    migration.puts "  def self.up"
       @migration.instructions.each do |instruction|
         current_inst  = instruction[0]
         current_table = instruction[1]
@@ -48,24 +56,24 @@ class Blackbird::Transition
         end
         
         if (current_indent < last_indent or (current_table != last_table and last_table)) and last_inst != :drop_table
-          puts "    end"
+          migration.puts "    end"
           last_indent = 0
         end
 
         if current_indent > last_indent and current_table != last_table
-          puts ""
-          puts "    change_table(#{current_table.inspect}) do |t|"
+          migration.puts ""
+          migration.puts "    change_table(#{current_table.inspect}) do |t|"
         end
 
         if current_indent == 0
-          puts ""
+          migration.puts ""
           if [:create_table, :change_table].include? current_inst
-            puts "    #{current_inst}(#{args_string}) do |t|"
+            migration.puts "    #{current_inst}(#{args_string}) do |t|"
           else
-            puts "    #{current_inst}(#{args_string})"
+            migration.puts "    #{current_inst}(#{args_string})"
           end
         else
-          puts "      t.#{current_inst}(#{args_string})"
+          migration.puts "      t.#{current_inst}(#{args_string})"
         end
 
         last_inst   = current_inst
@@ -74,11 +82,15 @@ class Blackbird::Transition
       end
 
       if last_indent > 0
-        puts "    end"
+        migration.puts "    end"
       end
-      puts ""
-    puts "  end"
-    puts "end"
+      migration.puts ""
+    migration.puts "  end"
+    migration.puts "end"
+    
+    File.open("db/migrate/#{timestamp}_t_#{timestamp}.rb", 'w+') do |f|
+      f.write migration.string
+    end
 
     self
   end

@@ -9,3 +9,7 @@ Bundler.definition.specs_for(groups).each do |spec|
   fragments = Dir.glob(pattern)
   Blackbird.options[:fragments].concat(fragments)
 end
+
+pattern   = File.join(Rails.root, 'app/schema/**', '*_fragment.rb')
+fragments = Dir.glob(pattern)
+Blackbird.options[:fragments].concat(fragments)
